@@ -73,7 +73,7 @@ import org.projectnessie.versioned.Unchanged;
 import org.projectnessie.versioned.VersionStore;
 import org.projectnessie.versioned.WithHash;
 
-public class TreeApiImpl extends BaseApiImpl implements TreeApi {
+public class TreeApiImpl extends BaseApiImpl {
 
   private static final int MAX_COMMIT_LOG_ENTRIES = 250;
 
@@ -85,14 +85,12 @@ public class TreeApiImpl extends BaseApiImpl implements TreeApi {
     super(config, store, accessChecker, principal);
   }
 
-  @Override
   public List<Reference> getAllReferences() {
     try (Stream<WithHash<NamedRef>> str = getStore().getNamedRefs()) {
       return str.map(TreeApiImpl::makeNamedRef).collect(Collectors.toList());
     }
   }
 
-  @Override
   public Reference getReferenceByName(String refName) throws NessieNotFoundException {
     try {
       return makeRef(getStore().toRef(refName));
@@ -101,7 +99,6 @@ public class TreeApiImpl extends BaseApiImpl implements TreeApi {
     }
   }
 
-  @Override
   public Reference createReference(String sourceRefName, Reference reference)
       throws NessieNotFoundException, NessieConflictException {
     NamedRef namedReference;
@@ -134,7 +131,6 @@ public class TreeApiImpl extends BaseApiImpl implements TreeApi {
     }
   }
 
-  @Override
   public Branch getDefaultBranch() throws NessieNotFoundException {
     Reference r = getReferenceByName(getConfig().getDefaultBranch());
     if (!(r instanceof Branch)) {
@@ -143,31 +139,26 @@ public class TreeApiImpl extends BaseApiImpl implements TreeApi {
     return (Branch) r;
   }
 
-  @Override
   public void assignTag(String tagName, String expectedHash, Reference assignTo)
       throws NessieNotFoundException, NessieConflictException {
     assignReference(TagName.of(tagName), expectedHash, assignTo);
   }
 
-  @Override
   public void deleteTag(String tagName, String hash)
       throws NessieConflictException, NessieNotFoundException {
     deleteReference(TagName.of(tagName), hash);
   }
 
-  @Override
   public void assignBranch(String branchName, String expectedHash, Reference assignTo)
       throws NessieNotFoundException, NessieConflictException {
     assignReference(BranchName.of(branchName), expectedHash, assignTo);
   }
 
-  @Override
   public void deleteBranch(String branchName, String hash)
       throws NessieConflictException, NessieNotFoundException {
     deleteReference(BranchName.of(branchName), hash);
   }
 
-  @Override
   public LogResponse getCommitLog(String namedRef, CommitLogParams params)
       throws NessieNotFoundException {
     int max =
@@ -241,7 +232,6 @@ public class TreeApiImpl extends BaseApiImpl implements TreeApi {
         });
   }
 
-  @Override
   public void transplantCommitsIntoBranch(
       String branchName, String hash, String message, Transplant transplant)
       throws NessieNotFoundException, NessieConflictException {
@@ -258,7 +248,6 @@ public class TreeApiImpl extends BaseApiImpl implements TreeApi {
     }
   }
 
-  @Override
   public void mergeRefIntoBranch(String branchName, String hash, Merge merge)
       throws NessieNotFoundException, NessieConflictException {
     try {
@@ -274,7 +263,6 @@ public class TreeApiImpl extends BaseApiImpl implements TreeApi {
     }
   }
 
-  @Override
   public EntriesResponse getEntries(String namedRef, EntriesParams params)
       throws NessieNotFoundException {
     WithHash<NamedRef> refWithHash = namedRefWithHashOrThrow(namedRef, params.hashOnRef());
@@ -366,7 +354,6 @@ public class TreeApiImpl extends BaseApiImpl implements TreeApi {
         });
   }
 
-  @Override
   public Branch commitMultipleOperations(String branch, String hash, Operations operations)
       throws NessieNotFoundException, NessieConflictException {
     List<org.projectnessie.versioned.Operation<Contents>> ops =
