@@ -295,6 +295,10 @@ public interface DatabaseAdapter {
     return null;
   }
 
+  default boolean diagnosticCheckGlobalPointer() throws InvalidProtocolBufferException {
+    return false;
+  }
+
   /**
    * Retrieve all global-content recorded in the global-content-log for the given keys +
    * content-ids. Callers must assume that the result will not be grouped by key or key+content-id.

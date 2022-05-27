@@ -86,6 +86,11 @@ public final class TracingDatabaseAdapter implements DatabaseAdapter {
   }
 
   @Override
+  public boolean diagnosticCheckGlobalPointer() throws InvalidProtocolBufferException {
+    return delegate.diagnosticCheckGlobalPointer();
+  }
+
+  @Override
   public void initializeRepo(String defaultBranchName) {
     try (Traced ignore = trace("initializeRepo").tag(TAG_REF, defaultBranchName)) {
       delegate.initializeRepo(defaultBranchName);

@@ -540,6 +540,22 @@ public class MongoDatabaseAdapter
   }
 
   @Override
+  public boolean diagnosticCheckGlobalPointer() throws InvalidProtocolBufferException {
+    GlobalStatePointer globalPtr = doFetchGlobalPointer(null);
+    for (ByteString bytes : globalPtr.getGlobalParentsInclHeadList()) {
+      Hash hash = Hash.of(bytes);
+      if (noAncestorHash().equals(hash)) {
+        continue;
+      }
+
+      if (doFetchFromGlobalLog(null, hash) == null) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
   protected GlobalStateLogEntry doFetchFromGlobalLog(
       NonTransactionalOperationContext ctx, Hash id) {
     return loadById(client.getGlobalLog(), id, GlobalStateLogEntry::parseFrom);
