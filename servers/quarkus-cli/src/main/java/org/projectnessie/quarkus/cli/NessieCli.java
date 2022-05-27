@@ -26,7 +26,15 @@ import picocli.CommandLine.HelpCommand;
     mixinStandardHelpOptions = true,
     versionProvider = NessieVersionProvider.class,
     description = "Nessie repository CLI",
-    subcommands = {NessieInfo.class, RepoMaintenance.class, HelpCommand.class})
+    subcommands = {
+      NessieInfo.class,
+      RepoMaintenance.class,
+      HelpCommand.class,
+      ValidateContent.class,
+      ContentInfo.class,
+      GlobalKeys.class,
+      CheckContent.class,
+    })
 public class NessieCli extends BaseCommand {
 
   @Override

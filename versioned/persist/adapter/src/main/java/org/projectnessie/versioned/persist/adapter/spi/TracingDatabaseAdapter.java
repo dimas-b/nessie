@@ -18,7 +18,10 @@ package org.projectnessie.versioned.persist.adapter.spi;
 import static org.projectnessie.versioned.persist.adapter.spi.Traced.trace;
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import java.io.PrintWriter;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -60,6 +63,26 @@ public final class TracingDatabaseAdapter implements DatabaseAdapter {
 
   public TracingDatabaseAdapter(DatabaseAdapter delegate) {
     this.delegate = delegate;
+  }
+
+  @Override
+  public Object diagnosticFetchGlobalPointer() {
+    return delegate.diagnosticFetchGlobalPointer();
+  }
+
+  @Override
+  public void diagnosticDumpGlobalLog(PrintWriter out) throws InvalidProtocolBufferException {
+    delegate.diagnosticDumpGlobalLog(out);
+  }
+
+  @Override
+  public void diagnosticAnalyseGlobalLog(PrintWriter out) throws InvalidProtocolBufferException {
+    delegate.diagnosticAnalyseGlobalLog(out);
+  }
+
+  @Override
+  public List<String> diagnosticListRepoIds() throws InvalidProtocolBufferException {
+    return delegate.diagnosticListRepoIds();
   }
 
   @Override

@@ -18,6 +18,7 @@ package org.projectnessie.versioned.persist.mongodb;
 import static org.projectnessie.versioned.persist.adapter.serialize.ProtoSerialization.protoToKeyList;
 import static org.projectnessie.versioned.persist.adapter.serialize.ProtoSerialization.toProto;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.mongodb.ErrorCategory;
 import com.mongodb.MongoWriteException;
@@ -29,13 +30,18 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertManyResult;
 import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
+import java.io.PrintWriter;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -77,7 +83,7 @@ public class MongoDatabaseAdapter
 
   private final MongoDatabaseClient client;
 
-  protected MongoDatabaseAdapter(
+  public MongoDatabaseAdapter(
       NonTransactionalDatabaseAdapterConfig config,
       MongoDatabaseClient client,
       StoreWorker<?, ?, ?> storeWorker) {
@@ -459,6 +465,78 @@ public class MongoDatabaseAdapter
   @Override
   protected GlobalStatePointer doFetchGlobalPointer(NonTransactionalOperationContext ctx) {
     return loadById(client.getGlobalPointers(), globalPointerKey, GlobalStatePointer::parseFrom);
+  }
+
+  @Override
+  public Object diagnosticFetchGlobalPointer() {
+    return doFetchGlobalPointer(null);
+  }
+
+  @Override
+  public void diagnosticDumpGlobalLog(PrintWriter out) throws InvalidProtocolBufferException {
+    GlobalStatePointer globalPtr = doFetchGlobalPointer(null);
+    out.printf("-- Global state pointer --%n");
+    out.printf("Global ID: %s%n", Hash.of(globalPtr.getGlobalId()));
+    out.printf("Refs: %s%n", globalPtr.getNamedReferencesList());
+    for (ByteString bytes : globalPtr.getGlobalParentsInclHeadList()) {
+      out.printf("Global parent: %s%n", Hash.of(bytes));
+    }
+
+    out.printf("-- Global Log --%n");
+    FindIterable<Document> docs =
+        client.getGlobalLog().find(Filters.eq(ID_REPO_PATH, repositoryId));
+    for (Document doc : docs) {
+      Binary data = doc.get(DATA_PROPERTY_NAME, Binary.class);
+      GlobalStateLogEntry entry = GlobalStateLogEntry.parseFrom(data.getData());
+      out.printf("Global log entry: %s%n", Hash.of(entry.getId()));
+      out.printf(
+          "... created: %s%n",
+          Instant.ofEpochMilli(TimeUnit.MICROSECONDS.toMillis(entry.getCreatedTime())));
+      out.printf("... puts: %s%n", entry.getPutsCount());
+      for (ByteString bytes : entry.getParentsList()) {
+        out.printf("... parent: %s%n", Hash.of(bytes));
+      }
+    }
+  }
+
+  @Override
+  public void diagnosticAnalyseGlobalLog(PrintWriter out) throws InvalidProtocolBufferException {
+    HashMap<Hash, Set<String>> parents = new HashMap<>(10000);
+    HashSet<Hash> entries = new HashSet<>(10000);
+
+    GlobalStatePointer globalPtr = doFetchGlobalPointer(null);
+    for (ByteString bytes : globalPtr.getGlobalParentsInclHeadList()) {
+      parents.computeIfAbsent(Hash.of(bytes), k -> new HashSet<>()).add("global-pointer");
+    }
+
+    FindIterable<Document> docs =
+        client.getGlobalLog().find(Filters.eq(ID_REPO_PATH, repositoryId));
+    for (Document doc : docs) {
+      Binary data = doc.get(DATA_PROPERTY_NAME, Binary.class);
+      GlobalStateLogEntry entry = GlobalStateLogEntry.parseFrom(data.getData());
+      Hash hash = Hash.of(entry.getId());
+      entries.add(hash);
+      for (ByteString bytes : entry.getParentsList()) {
+        parents.computeIfAbsent(Hash.of(bytes), k -> new HashSet<>()).add(hash.asString());
+      }
+    }
+
+    entries.forEach(parents::remove);
+    parents.remove(noAncestorHash());
+
+    for (Map.Entry<Hash, Set<String>> e : parents.entrySet()) {
+      out.printf("Dangling parent: %s, ref from: %s%n", e.getKey(), e.getValue());
+    }
+  }
+
+  @Override
+  public List<String> diagnosticListRepoIds() throws InvalidProtocolBufferException {
+    Set<String> ids = new HashSet<>();
+    FindIterable<Document> docs = client.getGlobalPointers().find();
+    for (Document doc : docs) {
+      ids.add("" + doc.get(ID_PROPERTY_NAME));
+    }
+    return new ArrayList<>(ids);
   }
 
   @Override

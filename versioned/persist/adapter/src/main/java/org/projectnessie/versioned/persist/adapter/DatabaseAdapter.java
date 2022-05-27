@@ -17,7 +17,10 @@ package org.projectnessie.versioned.persist.adapter;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import java.io.PrintWriter;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -275,6 +278,22 @@ public interface DatabaseAdapter {
    * <p>This operation is primarily used by Nessie-GC and must not be exposed via a public API.
    */
   Stream<ContentId> globalKeys();
+
+  default Object diagnosticFetchGlobalPointer() {
+    return null;
+  }
+
+  default void diagnosticDumpGlobalLog(PrintWriter out) throws InvalidProtocolBufferException {
+    // NOP
+  }
+
+  default void diagnosticAnalyseGlobalLog(PrintWriter out) throws InvalidProtocolBufferException {
+    // NOP
+  }
+
+  default List<String> diagnosticListRepoIds() throws InvalidProtocolBufferException {
+    return null;
+  }
 
   /**
    * Retrieve all global-content recorded in the global-content-log for the given keys +
