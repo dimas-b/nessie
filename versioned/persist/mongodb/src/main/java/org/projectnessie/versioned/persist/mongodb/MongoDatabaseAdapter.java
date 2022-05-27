@@ -17,6 +17,7 @@ package org.projectnessie.versioned.persist.mongodb;
 
 import static org.projectnessie.versioned.persist.adapter.serialize.ProtoSerialization.protoToKeyList;
 import static org.projectnessie.versioned.persist.adapter.serialize.ProtoSerialization.toProto;
+import static org.projectnessie.versioned.persist.adapter.spi.DatabaseAdapterUtil.randomHash;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -542,6 +543,10 @@ public class MongoDatabaseAdapter
   @Override
   public boolean diagnosticCheckGlobalPointer() throws InvalidProtocolBufferException {
     GlobalStatePointer globalPtr = doFetchGlobalPointer(null);
+    if (globalPtr == null) {
+      return true;
+    }
+
     for (ByteString bytes : globalPtr.getGlobalParentsInclHeadList()) {
       Hash hash = Hash.of(bytes);
       if (noAncestorHash().equals(hash)) {
@@ -553,6 +558,53 @@ public class MongoDatabaseAdapter
       }
     }
     return true;
+  }
+
+  @Override
+  public void diagnosticBackupGlobalPointer(String id) throws InvalidProtocolBufferException {
+    GlobalStatePointer old = doFetchGlobalPointer(null);
+    Document doc = toDoc(old);
+    doc.put(ID_PROPERTY_NAME, id);
+
+    InsertOneResult result = client.getGlobalPointers().insertOne(doc);
+
+    if (!result.wasAcknowledged()) {
+      throw new IllegalStateException("No ack");
+    }
+  }
+
+  @Override
+  public void diagnosticShowGlobalPointer(String id, PrintWriter out)
+      throws InvalidProtocolBufferException {
+    GlobalStatePointer globalPtr =
+        loadById(client.getGlobalPointers(), id, GlobalStatePointer::parseFrom);
+    out.printf("-- Global state pointer --%n");
+    out.printf("Global ID: %s%n", Hash.of(globalPtr.getGlobalId()));
+    out.printf("Refs: %s%n", globalPtr.getNamedReferencesList());
+    for (ByteString bytes : globalPtr.getGlobalParentsInclHeadList()) {
+      out.printf("Global parent: %s%n", Hash.of(bytes));
+    }
+  }
+
+  @Override
+  public void diagnosticSetGlobalPointerParent(String parentHash)
+      throws InvalidProtocolBufferException {
+    GlobalStatePointer old = doFetchGlobalPointer(null);
+
+    ByteString newGlobalId = randomHash().asBytes();
+    ByteString parent = Hash.of(parentHash).asBytes();
+    GlobalStatePointer ptr =
+        GlobalStatePointer.newBuilder()
+            .mergeFrom(old)
+            .setGlobalId(newGlobalId)
+            .clearGlobalParentsInclHead()
+            .setGlobalLogHead(parent)
+            .addGlobalParentsInclHead(parent)
+            .build();
+
+    if (!doGlobalPointerCas(null, old, ptr)) {
+      throw new IllegalStateException("CAS failed");
+    }
   }
 
   @Override

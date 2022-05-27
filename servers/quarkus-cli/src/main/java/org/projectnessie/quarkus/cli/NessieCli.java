@@ -35,6 +35,7 @@ import picocli.CommandLine.HelpCommand;
       GlobalKeys.class,
       CheckContent.class,
       CheckGlobalLog.class,
+      SetGlobalPointer.class,
     })
 public class NessieCli extends BaseCommand {
 

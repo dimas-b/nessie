@@ -299,6 +299,20 @@ public interface DatabaseAdapter {
     return false;
   }
 
+  default void diagnosticBackupGlobalPointer(String id) throws InvalidProtocolBufferException {
+    // NOP
+  }
+
+  default void diagnosticShowGlobalPointer(String id, PrintWriter out)
+      throws InvalidProtocolBufferException {
+    // NOP
+  }
+
+  default void diagnosticSetGlobalPointerParent(String parentHash)
+      throws InvalidProtocolBufferException {
+    // NOP
+  }
+
   /**
    * Retrieve all global-content recorded in the global-content-log for the given keys +
    * content-ids. Callers must assume that the result will not be grouped by key or key+content-id.
