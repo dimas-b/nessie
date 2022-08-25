@@ -141,7 +141,7 @@ public class NessieJaxRsExtension
     }
 
     if (parameterContext.isAnnotated(NessieUri.class)) {
-      return env.jerseyTest.target().getUri();
+      return env.jerseyTest.target().getUri().resolve("v1");
     }
 
     if (parameterContext.isAnnotated(NessieSecurityContext.class)) {

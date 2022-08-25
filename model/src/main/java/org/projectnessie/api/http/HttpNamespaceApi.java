@@ -43,7 +43,6 @@ import org.projectnessie.error.NessieReferenceNotFoundException;
 import org.projectnessie.model.GetNamespacesResponse;
 import org.projectnessie.model.Namespace;
 
-@Path("namespaces")
 @Consumes(value = MediaType.APPLICATION_JSON)
 public interface HttpNamespaceApi extends NamespaceApi {
 

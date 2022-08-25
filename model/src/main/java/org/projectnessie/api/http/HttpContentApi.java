@@ -39,7 +39,6 @@ import org.projectnessie.model.GetMultipleContentsRequest;
 import org.projectnessie.model.GetMultipleContentsResponse;
 
 @Consumes(value = MediaType.APPLICATION_JSON)
-@Path("contents")
 public interface HttpContentApi extends ContentApi {
   @Override
   @GET

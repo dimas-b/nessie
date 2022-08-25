@@ -33,7 +33,6 @@ import org.projectnessie.error.NessieNotFoundException;
 import org.projectnessie.model.DiffResponse;
 
 @Consumes(value = MediaType.APPLICATION_JSON)
-@Path("diffs")
 public interface HttpDiffApi extends DiffApi {
 
   @GET

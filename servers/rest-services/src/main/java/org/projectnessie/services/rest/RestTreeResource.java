@@ -17,6 +17,7 @@ package org.projectnessie.services.rest;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
 import org.projectnessie.api.TreeApi;
@@ -43,6 +44,7 @@ import org.projectnessie.versioned.VersionStore;
 
 /** REST endpoint for the tree-API. */
 @RequestScoped
+@Path("v1/trees")
 public class RestTreeResource implements HttpTreeApi {
   // Cannot extend the TreeApiImplWithAuthz class, because then CDI gets confused
   // about which interface to use - either HttpTreeApi or the plain TreeApi. This can lead

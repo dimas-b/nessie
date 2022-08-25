@@ -52,7 +52,6 @@ import org.projectnessie.model.ReferencesResponse;
 import org.projectnessie.model.Transplant;
 
 @Consumes(value = MediaType.APPLICATION_JSON)
-@Path("trees")
 public interface HttpTreeApi extends TreeApi {
 
   @Override
