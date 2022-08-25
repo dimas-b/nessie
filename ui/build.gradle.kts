@@ -34,7 +34,10 @@ plugins {
 
 val openapi by configurations.creating { description = "Used to reference OpenAPI spec files" }
 
-dependencies { openapi(project(":nessie-model", "openapi")) }
+// Use  Nessie REST API V1 in UI for now. TODO: Migrate to current Nessie REST API from `model`
+dependencies { openapi(create("org.projectnessie", "nessie-model", "0.40.2").setTransitive(false)) }
+// Resolve the openapi dependency immediately to avoid accidental override during integration tests
+openapi.resolve()
 
 node {
   download.set(true)
@@ -67,6 +70,14 @@ val pullOpenApiSpec by
   tasks.registering(Sync::class) {
     destinationDir = openApiSpecDir
     from(project.objects.property(Configuration::class).value(openapi))
+
+    doLast {
+      copy {
+        openApiSpecDir.listFiles { f -> f.name.endsWith(".jar") }?.forEach { f -> from(zipTree(f)) }
+        into(openApiSpecDir)
+        include("META-INF/openapi/openapi.yaml")
+      }
+    }
   }
 
 val nodeSetup =
