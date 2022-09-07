@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Dremio
+ * Copyright (C) 2022 Dremio
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.projectnessie.api.params;
+package org.projectnessie.apiv1.params;
 
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -21,10 +21,12 @@ import javax.annotation.Nullable;
 import javax.ws.rs.QueryParam;
 import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.projectnessie.api.params.FetchOption;
+import org.projectnessie.apiv1.http.HttpTreeApi;
 
 /**
- * The purpose of this class is to include optional parameters that can be passed to API methods
- * dealing with reference retrieval.
+ * The purpose of this class is to include optional parameters that can be passed to {@link
+ * HttpTreeApi#getAllReferences(ReferencesParams)}
  *
  * <p>For easier usage of this class, there is {@link ReferencesParams#builder()}, which allows
  * configuring/setting the different parameters.

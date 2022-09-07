@@ -17,8 +17,8 @@ package org.projectnessie.client.http.v1api;
 
 import java.util.stream.Stream;
 import org.projectnessie.api.params.FetchOption;
-import org.projectnessie.api.params.ReferencesParams;
-import org.projectnessie.api.params.ReferencesParamsBuilder;
+import org.projectnessie.apiv1.params.ReferencesParams;
+import org.projectnessie.apiv1.params.ReferencesParamsBuilder;
 import org.projectnessie.client.StreamingUtil;
 import org.projectnessie.client.api.GetAllReferencesBuilder;
 import org.projectnessie.client.http.NessieApiClient;

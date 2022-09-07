@@ -16,7 +16,7 @@
 package org.projectnessie.services.impl;
 
 import java.security.Principal;
-import org.projectnessie.api.params.DiffParams;
+import org.projectnessie.apiv1.params.DiffParams;
 import org.projectnessie.error.NessieNotFoundException;
 import org.projectnessie.model.DiffResponse;
 import org.projectnessie.services.authz.Authorizer;

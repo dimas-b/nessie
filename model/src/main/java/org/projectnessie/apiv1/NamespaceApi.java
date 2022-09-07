@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.projectnessie.api;
+package org.projectnessie.apiv1;
 
 import javax.validation.constraints.NotNull;
-import org.projectnessie.api.params.MultipleNamespacesParams;
-import org.projectnessie.api.params.NamespaceParams;
-import org.projectnessie.api.params.NamespaceUpdate;
+import org.projectnessie.apiv1.params.MultipleNamespacesParams;
+import org.projectnessie.apiv1.params.NamespaceParams;
+import org.projectnessie.apiv1.params.NamespaceUpdate;
 import org.projectnessie.error.NessieNamespaceAlreadyExistsException;
 import org.projectnessie.error.NessieNamespaceNotEmptyException;
 import org.projectnessie.error.NessieNamespaceNotFoundException;

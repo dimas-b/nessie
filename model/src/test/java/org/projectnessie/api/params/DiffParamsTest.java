@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.projectnessie.apiv1.params.DiffParams;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class DiffParamsTest {

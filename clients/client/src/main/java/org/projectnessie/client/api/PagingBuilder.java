@@ -16,7 +16,8 @@
 package org.projectnessie.client.api;
 
 import java.util.stream.Stream;
-import org.projectnessie.api.params.CommitLogParams;
+import org.projectnessie.apiv1.TreeApi;
+import org.projectnessie.apiv1.params.CommitLogParams;
 import org.projectnessie.error.NessieNotFoundException;
 
 public interface PagingBuilder<R extends PagingBuilder<R, RESP, ENTRY>, RESP, ENTRY> {
@@ -26,8 +27,7 @@ public interface PagingBuilder<R extends PagingBuilder<R, RESP, ENTRY>, RESP, EN
    * {@link #get()} method.
    *
    * <p>This setter reflects the OpenAPI parameter {@code maxRecords} in a paged request, for
-   * example {@link org.projectnessie.api.params.CommitLogParams} for {@link
-   * org.projectnessie.api.TreeApi#getCommitLog(String, CommitLogParams)}.
+   * example {@link CommitLogParams} for {@link TreeApi#getCommitLog(String, CommitLogParams)}.
    */
   R maxRecords(int maxRecords);
 
@@ -39,8 +39,7 @@ public interface PagingBuilder<R extends PagingBuilder<R, RESP, ENTRY>, RESP, EN
    * {@link #stream()} functions.
    *
    * <p>This setter reflects the OpenAPI parameter {@code pageToken} in a paged request, for example
-   * {@link org.projectnessie.api.params.CommitLogParams} for {@link
-   * org.projectnessie.api.TreeApi#getCommitLog(String, CommitLogParams)}.
+   * {@link CommitLogParams} for {@link TreeApi#getCommitLog(String, CommitLogParams)}.
    */
   R pageToken(String pageToken);
 

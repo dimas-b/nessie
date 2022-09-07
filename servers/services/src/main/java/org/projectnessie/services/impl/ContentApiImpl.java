@@ -19,7 +19,7 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.projectnessie.api.ContentApi;
+import org.projectnessie.apiv1.ContentApi;
 import org.projectnessie.error.NessieContentNotFoundException;
 import org.projectnessie.error.NessieNotFoundException;
 import org.projectnessie.error.NessieReferenceNotFoundException;

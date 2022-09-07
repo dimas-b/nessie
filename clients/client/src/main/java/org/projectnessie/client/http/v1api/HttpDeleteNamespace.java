@@ -16,8 +16,8 @@
 package org.projectnessie.client.http.v1api;
 
 import javax.annotation.Nullable;
-import org.projectnessie.api.params.NamespaceParams;
-import org.projectnessie.api.params.NamespaceParamsBuilder;
+import org.projectnessie.apiv1.params.NamespaceParams;
+import org.projectnessie.apiv1.params.NamespaceParamsBuilder;
 import org.projectnessie.client.api.DeleteNamespaceBuilder;
 import org.projectnessie.client.http.NessieApiClient;
 import org.projectnessie.error.NessieNamespaceNotEmptyException;

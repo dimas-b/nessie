@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.projectnessie.apiv1.params.ReferencesParams;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class ReferencesParamsTest {

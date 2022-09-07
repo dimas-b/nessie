@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Dremio
+ * Copyright (C) 2022 Dremio
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.projectnessie.api.http;
+package org.projectnessie.apiv1.http;
 
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
@@ -34,22 +34,22 @@ import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
-import org.projectnessie.api.TreeApi;
-import org.projectnessie.api.params.CommitLogParams;
-import org.projectnessie.api.params.EntriesParams;
-import org.projectnessie.api.params.GetReferenceParams;
-import org.projectnessie.api.params.ReferencesParams;
+import org.projectnessie.apiv1.TreeApi;
+import org.projectnessie.apiv1.model.Merge;
+import org.projectnessie.apiv1.model.Transplant;
+import org.projectnessie.apiv1.params.CommitLogParams;
+import org.projectnessie.apiv1.params.EntriesParams;
+import org.projectnessie.apiv1.params.GetReferenceParams;
+import org.projectnessie.apiv1.params.ReferencesParams;
 import org.projectnessie.error.NessieConflictException;
 import org.projectnessie.error.NessieNotFoundException;
 import org.projectnessie.model.Branch;
 import org.projectnessie.model.EntriesResponse;
 import org.projectnessie.model.LogResponse;
-import org.projectnessie.model.Merge;
 import org.projectnessie.model.MergeResponse;
 import org.projectnessie.model.Operations;
 import org.projectnessie.model.Reference;
 import org.projectnessie.model.ReferencesResponse;
-import org.projectnessie.model.Transplant;
 
 @Consumes(value = MediaType.APPLICATION_JSON)
 public interface HttpTreeApi extends TreeApi {

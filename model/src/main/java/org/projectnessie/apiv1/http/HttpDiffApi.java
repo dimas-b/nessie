@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Dremio
+ * Copyright (C) 2022 Dremio
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.projectnessie.api.http;
+package org.projectnessie.apiv1.http;
 
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
@@ -27,8 +27,8 @@ import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
-import org.projectnessie.api.DiffApi;
-import org.projectnessie.api.params.DiffParams;
+import org.projectnessie.apiv1.DiffApi;
+import org.projectnessie.apiv1.params.DiffParams;
 import org.projectnessie.error.NessieNotFoundException;
 import org.projectnessie.model.DiffResponse;
 

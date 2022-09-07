@@ -17,8 +17,8 @@ package org.projectnessie.services.impl;
 
 import java.security.Principal;
 import java.util.stream.Stream;
-import org.projectnessie.api.DiffApi;
-import org.projectnessie.api.params.DiffParams;
+import org.projectnessie.apiv1.DiffApi;
+import org.projectnessie.apiv1.params.DiffParams;
 import org.projectnessie.error.NessieNotFoundException;
 import org.projectnessie.error.NessieReferenceNotFoundException;
 import org.projectnessie.model.ContentKey;

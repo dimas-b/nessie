@@ -16,8 +16,8 @@
 package org.projectnessie.client.http.v1api;
 
 import javax.annotation.Nullable;
-import org.projectnessie.api.params.MultipleNamespacesParams;
-import org.projectnessie.api.params.MultipleNamespacesParamsBuilder;
+import org.projectnessie.apiv1.params.MultipleNamespacesParams;
+import org.projectnessie.apiv1.params.MultipleNamespacesParamsBuilder;
 import org.projectnessie.client.api.GetMultipleNamespacesBuilder;
 import org.projectnessie.client.http.NessieApiClient;
 import org.projectnessie.error.NessieReferenceNotFoundException;

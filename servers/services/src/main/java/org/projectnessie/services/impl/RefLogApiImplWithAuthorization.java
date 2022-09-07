@@ -16,7 +16,7 @@
 package org.projectnessie.services.impl;
 
 import java.security.Principal;
-import org.projectnessie.api.params.RefLogParams;
+import org.projectnessie.apiv1.params.RefLogParams;
 import org.projectnessie.error.NessieNotFoundException;
 import org.projectnessie.model.RefLogResponse;
 import org.projectnessie.services.authz.Authorizer;

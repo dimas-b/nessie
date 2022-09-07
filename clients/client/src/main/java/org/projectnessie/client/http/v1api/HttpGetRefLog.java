@@ -16,8 +16,8 @@
 package org.projectnessie.client.http.v1api;
 
 import java.util.stream.Stream;
-import org.projectnessie.api.params.RefLogParams;
-import org.projectnessie.api.params.RefLogParamsBuilder;
+import org.projectnessie.apiv1.params.RefLogParams;
+import org.projectnessie.apiv1.params.RefLogParamsBuilder;
 import org.projectnessie.client.StreamingUtil;
 import org.projectnessie.client.api.GetRefLogBuilder;
 import org.projectnessie.client.http.NessieApiClient;

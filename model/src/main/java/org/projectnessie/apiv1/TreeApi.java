@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Dremio
+ * Copyright (C) 2022 Dremio
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.projectnessie.api;
+package org.projectnessie.apiv1;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import org.projectnessie.api.params.CommitLogParams;
-import org.projectnessie.api.params.EntriesParams;
-import org.projectnessie.api.params.GetReferenceParams;
-import org.projectnessie.api.params.ReferencesParams;
 import org.projectnessie.apiv1.model.Merge;
 import org.projectnessie.apiv1.model.Transplant;
+import org.projectnessie.apiv1.params.CommitLogParams;
+import org.projectnessie.apiv1.params.EntriesParams;
+import org.projectnessie.apiv1.params.GetReferenceParams;
+import org.projectnessie.apiv1.params.ReferencesParams;
 import org.projectnessie.error.NessieConflictException;
 import org.projectnessie.error.NessieNotFoundException;
 import org.projectnessie.model.Branch;

@@ -16,8 +16,8 @@
 package org.projectnessie.client.http.v1api;
 
 import org.projectnessie.api.params.FetchOption;
-import org.projectnessie.api.params.GetReferenceParams;
-import org.projectnessie.api.params.GetReferenceParamsBuilder;
+import org.projectnessie.apiv1.params.GetReferenceParams;
+import org.projectnessie.apiv1.params.GetReferenceParamsBuilder;
 import org.projectnessie.client.api.GetReferenceBuilder;
 import org.projectnessie.client.http.NessieApiClient;
 import org.projectnessie.error.NessieNotFoundException;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Dremio
+ * Copyright (C) 2022 Dremio
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.projectnessie.api.http;
+package org.projectnessie.apiv1.http;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BeanParam;
@@ -32,10 +32,10 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
-import org.projectnessie.api.NamespaceApi;
-import org.projectnessie.api.params.MultipleNamespacesParams;
-import org.projectnessie.api.params.NamespaceParams;
-import org.projectnessie.api.params.NamespaceUpdate;
+import org.projectnessie.apiv1.NamespaceApi;
+import org.projectnessie.apiv1.params.MultipleNamespacesParams;
+import org.projectnessie.apiv1.params.NamespaceParams;
+import org.projectnessie.apiv1.params.NamespaceUpdate;
 import org.projectnessie.error.NessieNamespaceAlreadyExistsException;
 import org.projectnessie.error.NessieNamespaceNotEmptyException;
 import org.projectnessie.error.NessieNamespaceNotFoundException;

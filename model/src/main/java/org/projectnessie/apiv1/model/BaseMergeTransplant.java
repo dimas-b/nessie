@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.projectnessie.model;
+package org.projectnessie.apiv1.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -24,6 +24,10 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import org.immutables.value.Value;
+import org.projectnessie.model.ContentKey;
+import org.projectnessie.model.MergeBehavior;
+import org.projectnessie.model.MergeResponse;
+import org.projectnessie.model.Validation;
 
 public interface BaseMergeTransplant {
 
@@ -52,9 +56,11 @@ public interface BaseMergeTransplant {
   Boolean isFetchAdditionalInfo();
 
   /**
-   * When set to {@code true}, the {@code merge} and {@code transplant} operations will return
-   * {@link MergeResponse} objects when a content based conflict cannot be resolved, instead of
-   * throwing a {@link org.projectnessie.error.NessieReferenceConflictException}.
+   * When set to {@code true}, the {@link org.projectnessie.api.TreeApi#mergeRefIntoBranch(String,
+   * String, Merge)} and {@link org.projectnessie.api.TreeApi#transplantCommitsIntoBranch(String,
+   * String, String, Transplant)} operations will return {@link MergeResponse} object when a content
+   * based conflict cannot be resolved, instead of throwing a {@link
+   * org.projectnessie.error.NessieReferenceConflictException}.
    */
   @Nullable
   @JsonInclude(Include.NON_NULL)

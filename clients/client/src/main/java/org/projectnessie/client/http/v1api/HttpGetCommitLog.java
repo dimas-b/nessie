@@ -16,9 +16,9 @@
 package org.projectnessie.client.http.v1api;
 
 import java.util.stream.Stream;
-import org.projectnessie.api.params.CommitLogParams;
-import org.projectnessie.api.params.CommitLogParamsBuilder;
 import org.projectnessie.api.params.FetchOption;
+import org.projectnessie.apiv1.params.CommitLogParams;
+import org.projectnessie.apiv1.params.CommitLogParamsBuilder;
 import org.projectnessie.client.StreamingUtil;
 import org.projectnessie.client.api.GetCommitLogBuilder;
 import org.projectnessie.client.http.NessieApiClient;

@@ -16,8 +16,8 @@
 package org.projectnessie.client.http.v1api;
 
 import java.util.stream.Stream;
-import org.projectnessie.api.params.EntriesParams;
-import org.projectnessie.api.params.EntriesParamsBuilder;
+import org.projectnessie.apiv1.params.EntriesParams;
+import org.projectnessie.apiv1.params.EntriesParamsBuilder;
 import org.projectnessie.client.StreamingUtil;
 import org.projectnessie.client.api.GetEntriesBuilder;
 import org.projectnessie.client.http.NessieApiClient;
