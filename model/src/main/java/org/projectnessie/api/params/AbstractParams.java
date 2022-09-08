@@ -22,7 +22,7 @@ import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 public abstract class AbstractParams<IMPL extends AbstractParams<IMPL>> {
 
   @Parameter(description = "maximum number of entries to return, just a hint for the server")
-  @QueryParam("maxRecords")
+  @QueryParam("max-records")
   @Nullable
   private Integer maxRecords;
 
@@ -30,7 +30,7 @@ public abstract class AbstractParams<IMPL extends AbstractParams<IMPL>> {
       description =
           "paging continuation token, as returned in the previous value of the field 'token' in "
               + "the corresponding 'EntriesResponse' or 'LogResponse' or 'ReferencesResponse' or 'RefLogResponse'.")
-  @QueryParam("pageToken")
+  @QueryParam("page-token")
   @Nullable
   private String pageToken;
 

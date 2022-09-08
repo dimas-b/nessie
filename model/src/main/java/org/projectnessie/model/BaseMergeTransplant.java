@@ -15,6 +15,8 @@
  */
 package org.projectnessie.model;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -23,17 +25,18 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import org.immutables.value.Value;
 
 public interface BaseMergeTransplant {
 
+  @Size(min = 1)
+  @JsonInclude(NON_NULL)
+  String getMessage();
+
   @NotBlank
   @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)
   String getFromRefName();
-
-  @Nullable
-  @JsonInclude(Include.NON_NULL)
-  Boolean keepIndividualCommits();
 
   @Nullable
   @JsonInclude(Include.NON_NULL)

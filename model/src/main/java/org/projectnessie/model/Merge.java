@@ -19,25 +19,48 @@ import static org.projectnessie.model.Validation.validateHash;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
+import javax.validation.constraints.Size;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.media.SchemaProperty;
 import org.immutables.value.Value;
 
 @Schema(
-    type = SchemaType.OBJECT,
     title = "Merge Operation",
-    // Smallrye does neither support JsonFormat nor javax.validation.constraints.Pattern :(
     properties = {
-      @SchemaProperty(name = "fromRefName", pattern = Validation.REF_NAME_REGEX),
-      @SchemaProperty(name = "fromHash", pattern = Validation.HASH_REGEX)
+      @SchemaProperty(
+          name = "message",
+          description =
+              "Optional commit message for this merge request\n"
+                  + "\n"
+                  + "If not set, the server will generate a commit message automatically using metadata from the \n"
+                  + "merged commits."),
+      @SchemaProperty(
+          name = "fromHash",
+          pattern = Validation.HASH_REGEX,
+          description =
+              "The hash of the last commit to merge.\n"
+                  + "\n"
+                  + "This commit must be present in the history on 'fromRefName' before the first common parent with respect "
+                  + "to the target branch."),
+      @SchemaProperty(name = "fromRefName", ref = "fromRefName"),
+      @SchemaProperty(name = "keyMergeModes", ref = "keyMergeModes"),
+      @SchemaProperty(name = "defaultKeyMergeMode", ref = "defaultKeyMergeMode"),
+      @SchemaProperty(name = "dryRun", ref = "dryRun"),
+      @SchemaProperty(name = "fetchAdditionalInfo", ref = "fetchAdditionalInfo"),
+      @SchemaProperty(name = "returnConflictAsResult", ref = "returnConflictAsResult"),
     })
 @Value.Immutable
 @JsonSerialize(as = ImmutableMerge.class)
 @JsonDeserialize(as = ImmutableMerge.class)
 public interface Merge extends BaseMergeTransplant {
+
+  @Override
+  @Nullable
+  @Size(min = 1)
+  String getMessage();
 
   @NotBlank
   @Pattern(regexp = Validation.HASH_REGEX, message = Validation.HASH_MESSAGE)

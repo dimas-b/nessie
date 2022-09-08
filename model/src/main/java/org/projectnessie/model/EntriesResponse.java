@@ -15,9 +15,13 @@
  */
 package org.projectnessie.model;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.util.List;
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import org.immutables.value.Value;
 
@@ -32,6 +36,21 @@ public interface EntriesResponse extends PaginatedResponse {
 
   @NotNull
   List<Entry> getEntries();
+
+  /**
+   * Derived names of the first level of child namespaces relative to the {@code namespace}
+   * parameter of {@link org.projectnessie.api.params.EntriesParams}.
+   *
+   * <p>This data is included in the response only if requested by the @code derive-prefixes}
+   * request parameter.
+   *
+   * <p>This data applies only to the part of the whole set of entries used in constructing this
+   * response page. Subsequent pages may uncover new prefixes and may contain previously reported
+   * prefixes.
+   */
+  @Nullable
+  @JsonInclude(NON_NULL)
+  List<String> getPrefixes();
 
   @Value.Immutable
   @JsonSerialize(as = ImmutableEntry.class)

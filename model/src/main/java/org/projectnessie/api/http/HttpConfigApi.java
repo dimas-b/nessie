@@ -21,28 +21,33 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.projectnessie.api.ConfigApi;
 import org.projectnessie.model.NessieConfiguration;
 
 @Path("config")
+@Tag(name = "v1")
+@Tag(name = "v2")
 public interface HttpConfigApi extends ConfigApi {
 
   @Override
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  @Operation(summary = "List all configuration settings")
+  @Operation(summary = "Returns repository and server settings relevant to clients.")
   @APIResponses({
     @APIResponse(
+        responseCode = "200",
         description = "Configuration settings",
         content =
             @Content(
                 mediaType = "application/json",
-                schema = @Schema(implementation = NessieConfiguration.class))),
-    @APIResponse(responseCode = "401", description = "Invalid credentials provided"),
-    @APIResponse(responseCode = "400", description = "Unknown Error")
+                schema = @Schema(implementation = NessieConfiguration.class),
+                examples = {@ExampleObject(ref = "nessieConfig")})),
+    @APIResponse(responseCode = "401", description = "Invalid credentials provided")
   })
   NessieConfiguration getConfig();
 }

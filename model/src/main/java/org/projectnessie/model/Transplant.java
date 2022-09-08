@@ -32,13 +32,30 @@ import org.immutables.value.Value;
     title = "Transplant",
     // Smallrye does neither support JsonFormat nor javax.validation.constraints.Pattern :(
     properties = {
-      @SchemaProperty(name = "fromRefName", pattern = Validation.REF_NAME_REGEX),
-      @SchemaProperty(name = "hashesToTransplant", uniqueItems = true)
+      @SchemaProperty(
+          name = "message",
+          description = "Commit message for this transplant request."),
+      @SchemaProperty(
+          name = "hashesToTransplant",
+          uniqueItems = true,
+          description =
+              "Lists the hashes of commits that should be transplanted into the target branch."),
+      @SchemaProperty(name = "fromRefName", ref = "fromRefName"),
+      @SchemaProperty(name = "keyMergeModes", ref = "keyMergeModes"),
+      @SchemaProperty(name = "defaultKeyMergeMode", ref = "defaultKeyMergeMode"),
+      @SchemaProperty(name = "dryRun", ref = "dryRun"),
+      @SchemaProperty(name = "fetchAdditionalInfo", ref = "fetchAdditionalInfo"),
+      @SchemaProperty(name = "returnConflictAsResult", ref = "returnConflictAsResult"),
     })
 @Value.Immutable
 @JsonSerialize(as = ImmutableTransplant.class)
 @JsonDeserialize(as = ImmutableTransplant.class)
 public interface Transplant extends BaseMergeTransplant {
+
+  @Override
+  @NotNull
+  @Size(min = 1)
+  String getMessage();
 
   @NotNull
   @Size(min = 1)

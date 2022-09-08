@@ -19,21 +19,18 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.util.List;
 import javax.validation.constraints.NotNull;
-import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
-import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@Schema(type = SchemaType.OBJECT, title = "RefLogResponse")
 @JsonSerialize(as = ImmutableRefLogResponse.class)
 @JsonDeserialize(as = ImmutableRefLogResponse.class)
+@Deprecated // Not supported since API v2
 public interface RefLogResponse extends PaginatedResponse {
 
   @NotNull
   List<RefLogResponseEntry> getLogEntries();
 
   @Value.Immutable
-  @Schema(type = SchemaType.OBJECT, title = "RefLogResponseEntry")
   @JsonSerialize(as = ImmutableRefLogResponseEntry.class)
   @JsonDeserialize(as = ImmutableRefLogResponseEntry.class)
   interface RefLogResponseEntry {

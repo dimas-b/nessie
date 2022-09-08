@@ -33,15 +33,17 @@ public class ReferencesParams extends AbstractParams<ReferencesParams> {
 
   @Parameter(
       description =
-          "Specify how much information to be returned. Will fetch additional metadata for references if set to 'ALL'.\n\n"
-              + "A returned Branch instance will have the following information:\n\n"
+          "Specifies how much extra information is to be retrived from the server.\n\n"
+              + "If the fetch option is set to 'ALL' the following addition information will be returned for each "
+              + "Branch object in the output:\n\n"
               + "- numCommitsAhead (number of commits ahead of the default branch)\n\n"
               + "- numCommitsBehind (number of commits behind the default branch)\n\n"
               + "- commitMetaOfHEAD (the commit metadata of the HEAD commit)\n\n"
               + "- commonAncestorHash (the hash of the common ancestor in relation to the default branch).\n\n"
-              + "- numTotalCommits (the total number of commits in this reference).\n\n"
-              + "A returned Tag instance will only contain the 'commitMetaOfHEAD' and 'numTotalCommits' fields.\n\n"
-              + "Note that computing & fetching additional metadata might be computationally expensive on the server-side, so this flag should be used with care.")
+              + "- numTotalCommits (the total number of commits from the root to the HEAD of the branch).\n\n"
+              + "The returned Tag instances will only contain the 'commitMetaOfHEAD' and 'numTotalCommits' fields.\n\n"
+              + "Note that computing & fetching additional metadata might be computationally expensive on the "
+              + "server-side, so this flag should be used with care.")
   @QueryParam("fetch")
   @Nullable
   private FetchOption fetchOption;

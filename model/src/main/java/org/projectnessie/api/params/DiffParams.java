@@ -16,11 +16,9 @@
 package org.projectnessie.api.params;
 
 import java.util.Objects;
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.ws.rs.PathParam;
-import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.projectnessie.model.Validation;
 
@@ -30,79 +28,30 @@ public class DiffParams {
 
   @NotNull
   @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)
-  @Parameter(
-      description = "The 'from' reference to start the diff from",
-      examples = {@ExampleObject(ref = "ref")})
-  @PathParam("fromRef")
+  @Parameter(ref = "refPathFromParameter")
+  @PathParam("from-ref")
   private String fromRef;
-
-  @Nullable
-  @Pattern(regexp = HASH_OPTIONAL_REGEX, message = Validation.HASH_MESSAGE)
-  @Parameter(
-      description = "Optional hash on the 'from' reference to start the diff from",
-      examples = {@ExampleObject(ref = "hash")})
-  @PathParam("fromHashOnRef")
-  private String fromHashOnRef;
 
   @NotNull
   @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)
-  @Parameter(
-      description = "The 'to' reference to end the diff at.",
-      examples = {@ExampleObject(ref = "ref")})
-  @PathParam("toRef")
+  @Parameter(ref = "refPathToParameter")
+  @PathParam("to-ref")
   private String toRef;
-
-  @Nullable
-  @Pattern(regexp = HASH_OPTIONAL_REGEX, message = Validation.HASH_MESSAGE)
-  @Parameter(
-      description = "Optional hash on the 'to' reference to end the diff at.",
-      examples = {@ExampleObject(ref = "hash")})
-  @PathParam("toHashOnRef")
-  private String toHashOnRef;
 
   public DiffParams() {}
 
   @org.immutables.builder.Builder.Constructor
-  DiffParams(
-      @NotNull String fromRef,
-      @Nullable String fromHashOnRef,
-      @NotNull String toRef,
-      @Nullable String toHashOnRef) {
+  DiffParams(@NotNull String fromRef, @NotNull String toRef) {
     this.fromRef = fromRef;
-    this.fromHashOnRef = fromHashOnRef;
     this.toRef = toRef;
-    this.toHashOnRef = toHashOnRef;
   }
 
   public String getFromRef() {
     return fromRef;
   }
 
-  @Nullable
-  public String getFromHashOnRef() {
-    return emptyToNull(fromHashOnRef);
-  }
-
   public String getToRef() {
     return toRef;
-  }
-
-  @Nullable
-  public String getToHashOnRef() {
-    return emptyToNull(toHashOnRef);
-  }
-
-  private static String emptyToNull(String s) {
-    if (s == null || s.isEmpty()) {
-      return null;
-    }
-    if (s.charAt(0) == '*') {
-      if (s.length() == 1) {
-        return null;
-      }
-      return s.substring(1);
-    }
-    return s;
   }
 
   public static DiffParamsBuilder builder() {
@@ -118,14 +67,11 @@ public class DiffParams {
       return false;
     }
     DiffParams that = (DiffParams) o;
-    return Objects.equals(fromRef, that.fromRef)
-        && Objects.equals(fromHashOnRef, that.fromHashOnRef)
-        && Objects.equals(toRef, that.toRef)
-        && Objects.equals(toHashOnRef, that.toHashOnRef);
+    return Objects.equals(fromRef, that.fromRef) && Objects.equals(toRef, that.toRef);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(fromRef, fromHashOnRef, toRef, toHashOnRef);
+    return Objects.hash(fromRef, toRef);
   }
 }

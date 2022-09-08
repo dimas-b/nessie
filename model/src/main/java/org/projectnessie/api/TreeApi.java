@@ -15,27 +15,41 @@
  */
 package org.projectnessie.api;
 
-import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import org.projectnessie.api.params.CommitLogParams;
+import org.projectnessie.api.params.DiffParams;
 import org.projectnessie.api.params.EntriesParams;
 import org.projectnessie.api.params.GetReferenceParams;
 import org.projectnessie.api.params.ReferencesParams;
-import org.projectnessie.apiv1.model.Merge;
-import org.projectnessie.apiv1.model.Transplant;
 import org.projectnessie.error.NessieConflictException;
 import org.projectnessie.error.NessieNotFoundException;
 import org.projectnessie.model.Branch;
+import org.projectnessie.model.Content;
+import org.projectnessie.model.ContentKey;
+import org.projectnessie.model.DiffResponse;
 import org.projectnessie.model.EntriesResponse;
+import org.projectnessie.model.GetMultipleContentsRequest;
+import org.projectnessie.model.GetMultipleContentsResponse;
 import org.projectnessie.model.LogResponse;
+import org.projectnessie.model.Merge;
 import org.projectnessie.model.MergeResponse;
 import org.projectnessie.model.Operations;
 import org.projectnessie.model.Reference;
 import org.projectnessie.model.ReferencesResponse;
+import org.projectnessie.model.Transplant;
 import org.projectnessie.model.Validation;
 
+/**
+ * Interface for working with "trees", that is with collections of contents at a particular point in
+ * the change history, organized in trees by their respective namespaces.
+ *
+ * <p>A tree is identified by a reference (branch, tag or a "detached" commit hash).
+ *
+ * <p>Only branches and tags can be created / deleted / assigned via respective "*Reference"
+ * methods. Commits cannot be deleted and get created via commit / merge / transplant operations.
+ */
 public interface TreeApi {
 
   // Note: When substantial changes in Nessie API (this and related interfaces) are made
@@ -68,10 +82,11 @@ public interface TreeApi {
    */
   Reference createReference(
       @Valid
-          @Nullable
+          @NotNull
           @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)
-          String sourceRefName,
-      @Valid @NotNull Reference reference)
+          String name,
+      @Valid @NotNull Reference.ReferenceType type,
+      @Valid @NotNull Reference sourceRef)
       throws NessieNotFoundException, NessieConflictException;
 
   /** Get details of a particular ref, if it exists. */
@@ -129,38 +144,47 @@ public interface TreeApi {
       @Valid @NotNull CommitLogParams params)
       throws NessieNotFoundException;
 
-  /** Update a reference's HEAD to point to a different commit. */
+  /**
+   * Returns a set of content differences between two given references.
+   *
+   * @param params The {@link DiffParams} that includes the parameters for this API call.
+   * @return A set of diff values that show the difference between two given references.
+   */
+  DiffResponse getDiff(@Valid @NotNull DiffParams params) throws NessieNotFoundException;
+
+  /**
+   * Update a reference's HEAD to point to a different commit.
+   *
+   * @param type Optional expected type of reference being assigned. Will be validated if present.
+   */
   void assignReference(
-      @Valid @NotNull Reference.ReferenceType referenceType,
+      @Valid Reference.ReferenceType type,
       @Valid
           @NotNull
           @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)
-          String referenceName,
-      @Valid @NotNull @Pattern(regexp = Validation.HASH_REGEX, message = Validation.HASH_MESSAGE)
-          String expectedHash,
+          String reference,
       @Valid @NotNull Reference assignTo)
       throws NessieNotFoundException, NessieConflictException;
 
-  /** Delete a named reference. */
+  /**
+   * Delete a named reference.
+   *
+   * @param type Optional expected type of reference being deleted. Will be validated if present.
+   */
   void deleteReference(
-      @Valid @NotNull Reference.ReferenceType referenceType,
+      @Valid Reference.ReferenceType type,
       @Valid
           @NotNull
           @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)
-          String referenceName,
-      @Valid @NotNull @Pattern(regexp = Validation.HASH_REGEX, message = Validation.HASH_MESSAGE)
-          String expectedHash)
+          String reference)
       throws NessieConflictException, NessieNotFoundException;
 
-  /** cherry pick a set of commits into a branch. */
+  /** Cherry-pick a set of commits into a branch. */
   MergeResponse transplantCommitsIntoBranch(
       @Valid
           @NotNull
           @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)
-          String branchName,
-      @Valid @NotNull @Pattern(regexp = Validation.HASH_REGEX, message = Validation.HASH_MESSAGE)
-          String expectedHash,
-      @Valid String message,
+          String branch,
       @Valid Transplant transplant)
       throws NessieNotFoundException, NessieConflictException;
 
@@ -169,9 +193,7 @@ public interface TreeApi {
       @Valid
           @NotNull
           @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)
-          String branchName,
-      @Valid @NotNull @Pattern(regexp = Validation.HASH_REGEX, message = Validation.HASH_MESSAGE)
-          String expectedHash,
+          String branch,
       @Valid @NotNull Merge merge)
       throws NessieNotFoundException, NessieConflictException;
 
@@ -180,8 +202,7 @@ public interface TreeApi {
    * hash as its latest commit. The hash in the successful response contains the hash of the commit
    * that contains the operations of the invocation.
    *
-   * @param branchName Branch to change, defaults to default branch.
-   * @param expectedHash Expected hash of branch.
+   * @param branch Branch to change, defaults to default branch.
    * @param operations {@link Operations} to apply
    * @return updated {@link Branch} objects with the hash of the new HEAD
    * @throws NessieNotFoundException if {@code branchName} could not be found
@@ -192,9 +213,48 @@ public interface TreeApi {
       @Valid
           @NotNull
           @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)
-          String branchName,
-      @Valid @NotNull @Pattern(regexp = Validation.HASH_REGEX, message = Validation.HASH_MESSAGE)
-          String expectedHash,
+          String branch,
       @Valid @NotNull Operations operations)
       throws NessieNotFoundException, NessieConflictException;
+
+  /**
+   * This operation returns the {@link Content} for a {@link ContentKey} in a named-reference (a
+   * {@link org.projectnessie.model.Branch} or {@link org.projectnessie.model.Tag}).
+   *
+   * <p>If the table-metadata is tracked globally (Iceberg), Nessie returns a {@link Content}
+   * object, that contains the most up-to-date part for the globally tracked part (Iceberg:
+   * table-metadata) plus the per-Nessie-reference/hash specific part (Iceberg: snapshot-ID,
+   * schema-ID, partition-spec-ID, default-sort-order-ID).
+   *
+   * @param key the {@link ContentKey}s to retrieve
+   * @param ref named-reference to retrieve the content for
+   * @return list of {@link GetMultipleContentsResponse.ContentWithKey}s
+   * @throws NessieNotFoundException if {@code ref} or {@code hashOnRef} does not exist
+   */
+  Content getContent(
+      @Valid ContentKey key,
+      @Valid @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)
+          String ref)
+      throws NessieNotFoundException;
+
+  /**
+   * Similar to {@link #getContent(ContentKey, String)}, but takes multiple {@link ContentKey}s and
+   * returns the {@link Content} for the one or more {@link ContentKey}s in a named-reference (a
+   * {@link org.projectnessie.model.Branch} or {@link org.projectnessie.model.Tag}).
+   *
+   * <p>If the table-metadata is tracked globally (Iceberg), Nessie returns a {@link Content}
+   * object, that contains the most up-to-date part for the globally tracked part (Iceberg:
+   * table-metadata) plus the per-Nessie-reference/hash specific part (Iceberg: snapshot-id,
+   * schema-id, partition-spec-id, default-sort-order-id).
+   *
+   * @param ref named-reference to retrieve the content for
+   * @param request the {@link ContentKey}s to retrieve
+   * @return list of {@link GetMultipleContentsResponse.ContentWithKey}s
+   * @throws NessieNotFoundException if {@code ref} or {@code hashOnRef} does not exist
+   */
+  GetMultipleContentsResponse getMultipleContents(
+      @Valid @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)
+          String ref,
+      @Valid @NotNull GetMultipleContentsRequest request)
+      throws NessieNotFoundException;
 }

@@ -81,20 +81,23 @@ public class TestModelObjectsSerialization {
             Json.from("type", "TAG").add("name", "tagname").add("hash", HASH)),
         new Case(
             ImmutableTransplant.builder()
+                .message("test-message")
                 .addHashesToTransplant(HASH)
                 .fromRefName(branchName)
-                .build(),
-            Transplant.class,
-            Json.from("fromRefName", "testBranch").addArr("hashesToTransplant", HASH)),
-        new Case(
-            ImmutableTransplant.builder()
-                .addHashesToTransplant(HASH)
-                .fromRefName(branchName)
-                .keepIndividualCommits(true)
                 .build(),
             Transplant.class,
             Json.from("fromRefName", "testBranch")
-                .addNoQuotes("keepIndividualCommits", "true")
+                .add("message", "test-message")
+                .addArr("hashesToTransplant", HASH)),
+        new Case(
+            ImmutableTransplant.builder()
+                .message("test-message")
+                .addHashesToTransplant(HASH)
+                .fromRefName(branchName)
+                .build(),
+            Transplant.class,
+            Json.from("fromRefName", "testBranch")
+                .add("message", "test-message")
                 .addArr("hashesToTransplant", HASH)),
         new Case(
             EntriesResponse.builder()
@@ -154,15 +157,9 @@ public class TestModelObjectsSerialization {
             Merge.class,
             Json.from("fromRefName", "testBranch").add("fromHash", HASH)),
         new Case(
-            ImmutableMerge.builder()
-                .fromHash(HASH)
-                .fromRefName(branchName)
-                .keepIndividualCommits(true)
-                .build(),
+            ImmutableMerge.builder().fromHash(HASH).fromRefName(branchName).build(),
             Merge.class,
-            Json.from("fromRefName", "testBranch")
-                .addNoQuotes("keepIndividualCommits", "true")
-                .add("fromHash", HASH)),
+            Json.from("fromRefName", "testBranch").add("fromHash", HASH)),
         new Case(
             ImmutableMerge.builder()
                 .fromHash(HASH)
@@ -188,7 +185,6 @@ public class TestModelObjectsSerialization {
             ImmutableMerge.builder()
                 .fromHash(HASH)
                 .fromRefName(branchName)
-                .keepIndividualCommits(true)
                 .isDryRun(false)
                 .addKeyMergeModes(
                     MergeKeyBehavior.of(ContentKey.of("merge", "me"), MergeBehavior.NORMAL),
@@ -196,7 +192,6 @@ public class TestModelObjectsSerialization {
                 .build(),
             Merge.class,
             Json.from("fromRefName", "testBranch")
-                .addNoQuotes("keepIndividualCommits", "true")
                 .addArrNoQuotes(
                     "keyMergeModes",
                     Json.noQuotes("key", Json.arr("elements", "merge", "me"))

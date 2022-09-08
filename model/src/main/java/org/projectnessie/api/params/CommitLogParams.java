@@ -37,19 +37,11 @@ public class CommitLogParams extends AbstractParams<CommitLogParams> {
   @Pattern(regexp = Validation.HASH_REGEX, message = Validation.HASH_MESSAGE)
   @Parameter(
       description =
-          "Hash on the given ref to start from (in chronological sense), the 'far' end of the commit log, returned 'late' in the result.",
+          "Hash on the given ref to identify the commit where the operation of fetching the log "
+              + "should stop, i.e. the 'far' end of the commit log, returned late in the result.",
       examples = {@ExampleObject(ref = "nullHash"), @ExampleObject(ref = "hash")})
-  @QueryParam("startHash")
+  @QueryParam("limit-hash")
   private String startHash;
-
-  @Nullable
-  @Pattern(regexp = Validation.HASH_REGEX, message = Validation.HASH_MESSAGE)
-  @Parameter(
-      description =
-          "Hash on the given ref to end at (in chronological sense), the 'near' end of the commit log, returned 'early' in the result.",
-      examples = {@ExampleObject(ref = "nullHash"), @ExampleObject(ref = "hash")})
-  @QueryParam("endHash")
-  private String endHash;
 
   @Nullable
   @Parameter(
@@ -82,14 +74,12 @@ public class CommitLogParams extends AbstractParams<CommitLogParams> {
   @org.immutables.builder.Builder.Constructor
   CommitLogParams(
       @Nullable String startHash,
-      @Nullable String endHash,
       @Nullable Integer maxRecords,
       @Nullable String pageToken,
       @Nullable String filter,
       @Nullable FetchOption fetchOption) {
     super(maxRecords, pageToken);
     this.startHash = startHash;
-    this.endHash = endHash;
     this.filter = filter;
     this.fetchOption = fetchOption;
   }
@@ -97,11 +87,6 @@ public class CommitLogParams extends AbstractParams<CommitLogParams> {
   @Nullable
   public String startHash() {
     return startHash;
-  }
-
-  @Nullable
-  public String endHash() {
-    return endHash;
   }
 
   @Nullable
@@ -124,14 +109,13 @@ public class CommitLogParams extends AbstractParams<CommitLogParams> {
 
   @Override
   public CommitLogParams forNextPage(String pageToken) {
-    return new CommitLogParams(startHash, endHash, maxRecords(), pageToken, filter, fetchOption);
+    return new CommitLogParams(startHash, maxRecords(), pageToken, filter, fetchOption);
   }
 
   @Override
   public String toString() {
     return new StringJoiner(", ", CommitLogParams.class.getSimpleName() + "[", "]")
         .add("startHash='" + startHash + "'")
-        .add("endHash='" + endHash + "'")
         .add("maxRecords=" + maxRecords())
         .add("pageToken='" + pageToken() + "'")
         .add("filter='" + filter + "'")
@@ -149,7 +133,6 @@ public class CommitLogParams extends AbstractParams<CommitLogParams> {
     }
     CommitLogParams that = (CommitLogParams) o;
     return Objects.equals(startHash, that.startHash)
-        && Objects.equals(endHash, that.endHash)
         && Objects.equals(maxRecords(), that.maxRecords())
         && Objects.equals(pageToken(), that.pageToken())
         && Objects.equals(filter, that.filter)
@@ -158,6 +141,6 @@ public class CommitLogParams extends AbstractParams<CommitLogParams> {
 
   @Override
   public int hashCode() {
-    return Objects.hash(startHash, endHash, maxRecords(), pageToken(), filter, fetchOption);
+    return Objects.hash(startHash, maxRecords(), pageToken(), filter, fetchOption);
   }
 }

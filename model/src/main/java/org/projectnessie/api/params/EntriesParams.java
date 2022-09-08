@@ -18,11 +18,10 @@ package org.projectnessie.api.params;
 import java.util.Objects;
 import java.util.StringJoiner;
 import javax.annotation.Nullable;
-import javax.validation.constraints.Pattern;
 import javax.ws.rs.QueryParam;
 import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
-import org.projectnessie.model.Validation;
+import org.projectnessie.model.ContentKey;
 
 /**
  * The purpose of this class is to include optional parameters that can be passed to {@code
@@ -34,20 +33,31 @@ import org.projectnessie.model.Validation;
 public class EntriesParams extends AbstractParams<EntriesParams> {
 
   @Nullable
-  @Pattern(regexp = Validation.HASH_REGEX, message = Validation.HASH_MESSAGE)
-  @Parameter(
-      description = "a particular hash on the given ref",
-      examples = {@ExampleObject(ref = "nullHash"), @ExampleObject(ref = "hash")})
-  @QueryParam("hashOnRef")
-  private String hashOnRef;
-
-  @Nullable
   @Parameter(
       description =
-          "If set > 0 will filter the results to only return namespaces/tables to the depth of namespaceDepth. If not set or <=0 has no effect\n"
-              + "Setting this parameter > 0 will turn off paging.")
-  @QueryParam("namespaceDepth")
-  private Integer namespaceDepth;
+          "Optional namespace filter that will only permit entries whose namespace equals this namespace parameter.\n"
+              + "\n"
+              + "This filter takes precedence over the CEL 'filter' parameter.\n"
+              + "\n"
+              + "Setting this parameter allows automatically deriving the first level of child namespace prefixes for "
+              + "the entries in deeper namespaces. To enable this functionality the 'derive-prefixes' parameter must "
+              + "also be set to 'true'). Prefixes are derived separately for each response page.",
+      examples = @ExampleObject("namespace"))
+  @QueryParam("namespace")
+  private ContentKey namespace;
+
+  @Parameter(
+      description =
+          "Request namespace prefix derivation when the 'namespace' filter is used.\n"
+              + "\n"
+              + "Setting this parameter to 'true' without specifying a value for the 'namespace' parameter implies "
+              + "using the 'root' namespace both for filtering and deriving prefixes.\n"
+              + "\n"
+              + "The CEL 'filter' parameter indirectly affects how prefixes are reported. Using a more restrictive "
+              + "filter will require more entries to be processed to fill the results page. Consequently the scope of "
+              + "reported prefixes will cover a larger set of entries.")
+  @QueryParam("derive-prefixes")
+  private Boolean derivePrefixes;
 
   @Nullable
   @Parameter(
@@ -66,14 +76,14 @@ public class EntriesParams extends AbstractParams<EntriesParams> {
 
   @org.immutables.builder.Builder.Constructor
   EntriesParams(
-      @Nullable String hashOnRef,
       @Nullable Integer maxRecords,
       @Nullable String pageToken,
-      @Nullable Integer namespaceDepth,
+      @Nullable ContentKey namespace,
+      @Nullable Boolean derivePrefixes,
       @Nullable String filter) {
     super(maxRecords, pageToken);
-    this.hashOnRef = hashOnRef;
-    this.namespaceDepth = namespaceDepth;
+    this.namespace = namespace;
+    this.derivePrefixes = derivePrefixes;
     this.filter = filter;
   }
 
@@ -86,33 +96,23 @@ public class EntriesParams extends AbstractParams<EntriesParams> {
   }
 
   @Nullable
-  public String hashOnRef() {
-    return hashOnRef;
-  }
-
-  @Nullable
   public String filter() {
     return filter;
   }
 
-  @Nullable
-  public Integer namespaceDepth() {
-    return namespaceDepth;
-  }
-
   @Override
   public EntriesParams forNextPage(String pageToken) {
-    return new EntriesParams(hashOnRef, maxRecords(), pageToken, namespaceDepth, filter);
+    return new EntriesParams(maxRecords(), pageToken, namespace, derivePrefixes, filter);
   }
 
   @Override
   public String toString() {
     return new StringJoiner(", ", EntriesParams.class.getSimpleName() + "[", "]")
-        .add("hashOnRef='" + hashOnRef + "'")
         .add("maxRecords=" + maxRecords())
         .add("pageToken='" + pageToken() + "'")
         .add("filter='" + filter + "'")
-        .add("namespaceDepth='" + namespaceDepth + "'")
+        .add("namespace='" + namespace + "'")
+        .add("derivePrefixes='" + derivePrefixes + "'")
         .toString();
   }
 
@@ -125,15 +125,15 @@ public class EntriesParams extends AbstractParams<EntriesParams> {
       return false;
     }
     EntriesParams that = (EntriesParams) o;
-    return Objects.equals(hashOnRef, that.hashOnRef)
-        && Objects.equals(maxRecords(), that.maxRecords())
+    return Objects.equals(maxRecords(), that.maxRecords())
         && Objects.equals(pageToken(), that.pageToken())
-        && Objects.equals(namespaceDepth, that.namespaceDepth)
+        && Objects.equals(namespace, that.namespace)
+        && Objects.equals(derivePrefixes, that.derivePrefixes)
         && Objects.equals(filter, that.filter);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(hashOnRef, maxRecords(), pageToken(), namespaceDepth, filter);
+    return Objects.hash(maxRecords(), pageToken(), namespace, derivePrefixes, filter);
   }
 }

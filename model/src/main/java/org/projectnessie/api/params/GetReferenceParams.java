@@ -22,16 +22,13 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
-import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.immutables.builder.Builder;
 import org.projectnessie.model.Validation;
 
 public class GetReferenceParams {
 
-  @Parameter(
-      description = "name of ref to fetch",
-      examples = {@ExampleObject(ref = "ref")})
+  @Parameter(ref = "refPathParameter")
   @PathParam("ref")
   @NotNull
   @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)
