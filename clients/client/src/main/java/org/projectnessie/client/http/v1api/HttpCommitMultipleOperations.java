@@ -15,46 +15,22 @@
  */
 package org.projectnessie.client.http.v1api;
 
-import java.util.List;
-import org.projectnessie.client.api.CommitMultipleOperationsBuilder;
-import org.projectnessie.client.http.NessieApiClient;
+import org.projectnessie.apiv1.http.HttpTreeApi;
+import org.projectnessie.client.builder.BaseCommitMultipleOperationsBuilder;
 import org.projectnessie.error.NessieConflictException;
 import org.projectnessie.error.NessieNotFoundException;
 import org.projectnessie.model.Branch;
-import org.projectnessie.model.CommitMeta;
-import org.projectnessie.model.ImmutableOperations;
-import org.projectnessie.model.Operation;
 
-final class HttpCommitMultipleOperations
-    extends BaseHttpOnBranchRequest<CommitMultipleOperationsBuilder>
-    implements CommitMultipleOperationsBuilder {
+final class HttpCommitMultipleOperations extends BaseCommitMultipleOperationsBuilder {
 
-  private final ImmutableOperations.Builder operations = ImmutableOperations.builder();
+  private final HttpTreeApi api;
 
-  HttpCommitMultipleOperations(NessieApiClient client) {
-    super(client);
-  }
-
-  @Override
-  public CommitMultipleOperationsBuilder commitMeta(CommitMeta commitMeta) {
-    operations.commitMeta(commitMeta);
-    return this;
-  }
-
-  @Override
-  public CommitMultipleOperationsBuilder operations(List<Operation> operations) {
-    this.operations.addAllOperations(operations);
-    return this;
-  }
-
-  @Override
-  public CommitMultipleOperationsBuilder operation(Operation operation) {
-    operations.addOperations(operation);
-    return this;
+  HttpCommitMultipleOperations(HttpTreeApi api) {
+    this.api = api;
   }
 
   @Override
   public Branch commit() throws NessieNotFoundException, NessieConflictException {
-    return client.getTreeApi().commitMultipleOperations(branchName, hash, operations.build());
+    return api.commitMultipleOperations(branchName, hash, operations.build());
   }
 }

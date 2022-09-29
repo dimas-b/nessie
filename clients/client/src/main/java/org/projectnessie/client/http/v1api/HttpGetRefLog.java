@@ -15,71 +15,34 @@
  */
 package org.projectnessie.client.http.v1api;
 
-import java.util.stream.Stream;
+import org.projectnessie.apiv1.http.HttpRefLogApi;
 import org.projectnessie.apiv1.params.RefLogParams;
-import org.projectnessie.apiv1.params.RefLogParamsBuilder;
-import org.projectnessie.client.StreamingUtil;
-import org.projectnessie.client.api.GetRefLogBuilder;
-import org.projectnessie.client.http.NessieApiClient;
+import org.projectnessie.client.builder.BaseGetRefLogBuilder;
 import org.projectnessie.error.NessieNotFoundException;
 import org.projectnessie.model.RefLogResponse;
-import org.projectnessie.model.RefLogResponse.RefLogResponseEntry;
 
-final class HttpGetRefLog extends BaseHttpRequest implements GetRefLogBuilder {
+final class HttpGetRefLog extends BaseGetRefLogBuilder<RefLogParams> {
 
-  private final RefLogParamsBuilder params = RefLogParams.builder();
+  private final HttpRefLogApi api;
 
-  HttpGetRefLog(NessieApiClient client) {
-    super(client);
+  HttpGetRefLog(HttpRefLogApi api) {
+    super(RefLogParams::forNextPage);
+    this.api = api;
   }
 
   @Override
-  public GetRefLogBuilder untilHash(String untilHash) {
-    params.startHash(untilHash);
-    return this;
+  protected RefLogParams params() {
+    return RefLogParams.builder()
+        .startHash(untilHash)
+        .endHash(fromHash)
+        .filter(filter)
+        .maxRecords(maxRecords)
+        .build();
   }
 
+  @SuppressWarnings("deprecation")
   @Override
-  public GetRefLogBuilder fromHash(String fromHash) {
-    params.endHash(fromHash);
-    return this;
-  }
-
-  @Override
-  public GetRefLogBuilder filter(String filter) {
-    params.filter(filter);
-    return this;
-  }
-
-  @Override
-  public GetRefLogBuilder maxRecords(int maxRecords) {
-    params.maxRecords(maxRecords);
-    return this;
-  }
-
-  @Override
-  public GetRefLogBuilder pageToken(String pageToken) {
-    params.pageToken(pageToken);
-    return this;
-  }
-
-  private RefLogParams params() {
-    return params.build();
-  }
-
-  @Override
-  public RefLogResponse get() throws NessieNotFoundException {
-    return get(params());
-  }
-
-  private RefLogResponse get(RefLogParams p) throws NessieNotFoundException {
-    return client.getRefLogApi().getRefLog(p);
-  }
-
-  @Override
-  public Stream<RefLogResponseEntry> stream() throws NessieNotFoundException {
-    RefLogParams p = params();
-    return StreamingUtil.generateStream(
-        RefLogResponse::getLogEntries, pageToken -> get(p.forNextPage(pageToken)));
+  protected RefLogResponse get(RefLogParams p) throws NessieNotFoundException {
+    return api.getRefLog(p);
   }
 }

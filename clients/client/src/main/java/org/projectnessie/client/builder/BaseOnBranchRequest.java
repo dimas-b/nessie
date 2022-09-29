@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Dremio
+ * Copyright (C) 2022 Dremio
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,29 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.projectnessie.client.http.v1api;
+package org.projectnessie.client.builder;
 
-import org.projectnessie.client.api.OnReferenceBuilder;
-import org.projectnessie.client.http.NessieApiClient;
+import org.projectnessie.client.api.OnBranchBuilder;
 
-abstract class BaseHttpOnReferenceRequest<R extends OnReferenceBuilder<R>> extends BaseHttpRequest
-    implements OnReferenceBuilder<R> {
-  protected String refName;
-  protected String hashOnRef;
-
-  BaseHttpOnReferenceRequest(NessieApiClient client) {
-    super(client);
-  }
+public abstract class BaseOnBranchRequest<R extends OnBranchBuilder<R>>
+    implements OnBranchBuilder<R> {
+  protected String branchName;
+  protected String hash;
 
   @Override
-  public R refName(String refName) {
-    this.refName = refName;
+  public R branchName(String branchName) {
+    this.branchName = branchName;
     return (R) this;
   }
 
   @Override
-  public R hashOnRef(String hashOnRef) {
-    this.hashOnRef = hashOnRef;
+  public R hash(String hash) {
+    this.hash = hash;
     return (R) this;
   }
 }

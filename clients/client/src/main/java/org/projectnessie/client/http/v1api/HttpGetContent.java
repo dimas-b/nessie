@@ -15,44 +15,27 @@
  */
 package org.projectnessie.client.http.v1api;
 
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.projectnessie.client.api.GetContentBuilder;
-import org.projectnessie.client.http.NessieApiClient;
+import org.projectnessie.apiv1.http.HttpContentApi;
+import org.projectnessie.client.builder.BaseGetContentBuilder;
 import org.projectnessie.error.NessieNotFoundException;
 import org.projectnessie.model.Content;
 import org.projectnessie.model.ContentKey;
 import org.projectnessie.model.GetMultipleContentsResponse;
 import org.projectnessie.model.GetMultipleContentsResponse.ContentWithKey;
-import org.projectnessie.model.ImmutableGetMultipleContentsRequest;
 
-final class HttpGetContent extends BaseHttpOnReferenceRequest<GetContentBuilder>
-    implements GetContentBuilder {
+final class HttpGetContent extends BaseGetContentBuilder {
 
-  private final ImmutableGetMultipleContentsRequest.Builder request =
-      ImmutableGetMultipleContentsRequest.builder();
+  private final HttpContentApi api;
 
-  HttpGetContent(NessieApiClient client) {
-    super(client);
-  }
-
-  @Override
-  public GetContentBuilder key(ContentKey key) {
-    request.addRequestedKeys(key);
-    return this;
-  }
-
-  @Override
-  public GetContentBuilder keys(List<ContentKey> keys) {
-    request.addAllRequestedKeys(keys);
-    return this;
+  HttpGetContent(HttpContentApi api) {
+    this.api = api;
   }
 
   @Override
   public Map<ContentKey, Content> get() throws NessieNotFoundException {
-    GetMultipleContentsResponse resp =
-        client.getContentApi().getMultipleContents(refName, hashOnRef, request.build());
+    GetMultipleContentsResponse resp = api.getMultipleContents(refName, hashOnRef, request.build());
     return resp.getContents().stream()
         .collect(Collectors.toMap(ContentWithKey::getKey, ContentWithKey::getContent));
   }

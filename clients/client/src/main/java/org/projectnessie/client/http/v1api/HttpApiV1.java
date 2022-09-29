@@ -66,101 +66,101 @@ public final class HttpApiV1 implements NessieApiV1 {
 
   @Override
   public GetContentBuilder getContent() {
-    return new HttpGetContent(client);
+    return new HttpGetContent(client.getContentApi());
   }
 
   @Override
   public GetAllReferencesBuilder getAllReferences() {
-    return new HttpGetAllReferences(client);
+    return new HttpGetAllReferences(client.getTreeApi());
   }
 
   @Override
   public GetReferenceBuilder getReference() {
-    return new HttpGetReference(client);
+    return new HttpGetReference(client.getTreeApi());
   }
 
   @Override
   public CreateReferenceBuilder createReference() {
-    return new HttpCreateReference(client);
+    return new HttpCreateReference(client.getTreeApi());
   }
 
   @Override
   public GetEntriesBuilder getEntries() {
-    return new HttpGetEntries(client);
+    return new HttpGetEntries(client.getTreeApi());
   }
 
   @Override
   public GetCommitLogBuilder getCommitLog() {
-    return new HttpGetCommitLog(client);
+    return new HttpGetCommitLog(client.getTreeApi());
   }
 
   @Override
   public AssignTagBuilder assignTag() {
-    return new HttpAssignTag(client);
+    return new HttpAssignTag(client.getTreeApi());
   }
 
   @Override
   public DeleteTagBuilder deleteTag() {
-    return new HttpDeleteTag(client);
+    return new HttpDeleteTag(client.getTreeApi());
   }
 
   @Override
   public AssignBranchBuilder assignBranch() {
-    return new HttpAssignBranch(client);
+    return new HttpAssignBranch(client.getTreeApi());
   }
 
   @Override
   public DeleteBranchBuilder deleteBranch() {
-    return new HttpDeleteBranch(client);
+    return new HttpDeleteBranch(client.getTreeApi());
   }
 
   @Override
   public TransplantCommitsBuilder transplantCommitsIntoBranch() {
-    return new HttpTransplantCommits(client);
+    return new HttpTransplantCommits(client.getTreeApi());
   }
 
   @Override
   public MergeReferenceBuilder mergeRefIntoBranch() {
-    return new HttpMergeReference(client);
+    return new HttpMergeReference(client.getTreeApi());
   }
 
   @Override
   public CommitMultipleOperationsBuilder commitMultipleOperations() {
-    return new HttpCommitMultipleOperations(client);
+    return new HttpCommitMultipleOperations(client.getTreeApi());
   }
 
   @Override
   public GetDiffBuilder getDiff() {
-    return new HttpGetDiff(client);
+    return new HttpGetDiff(client.getDiffApi());
   }
 
   @Override
   public GetRefLogBuilder getRefLog() {
-    return new HttpGetRefLog(client);
+    return new HttpGetRefLog(client.getRefLogApi());
   }
 
   @Override
   public GetNamespaceBuilder getNamespace() {
-    return new HttpGetNamespace(client);
+    return new HttpGetNamespace(client.getNamespaceApi());
   }
 
   @Override
   public GetMultipleNamespacesBuilder getMultipleNamespaces() {
-    return new HttpGetMultipleNamespaces(client);
+    return new HttpGetMultipleNamespaces(client.getNamespaceApi());
   }
 
   @Override
   public CreateNamespaceBuilder createNamespace() {
-    return new HttpCreateNamespace(client);
+    return new HttpCreateNamespace(client.getNamespaceApi());
   }
 
   @Override
   public DeleteNamespaceBuilder deleteNamespace() {
-    return new HttpDeleteNamespace(client);
+    return new HttpDeleteNamespace(client.getNamespaceApi());
   }
 
   @Override
   public UpdateNamespaceBuilder updateProperties() {
-    return new HttpUpdateNamespace(client);
+    return new HttpUpdateNamespace(client.getNamespaceApi());
   }
 }

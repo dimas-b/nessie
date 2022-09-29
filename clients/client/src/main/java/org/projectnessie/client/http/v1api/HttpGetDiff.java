@@ -15,47 +15,29 @@
  */
 package org.projectnessie.client.http.v1api;
 
+import org.projectnessie.apiv1.http.HttpDiffApi;
 import org.projectnessie.apiv1.params.DiffParams;
 import org.projectnessie.apiv1.params.DiffParamsBuilder;
-import org.projectnessie.client.api.GetDiffBuilder;
-import org.projectnessie.client.http.NessieApiClient;
+import org.projectnessie.client.builder.BaseGetDiffBuilder;
 import org.projectnessie.error.NessieNotFoundException;
 import org.projectnessie.model.DiffResponse;
 
-final class HttpGetDiff extends BaseHttpRequest implements GetDiffBuilder {
+final class HttpGetDiff extends BaseGetDiffBuilder {
 
-  DiffParamsBuilder builder = DiffParams.builder();
+  private final HttpDiffApi api;
 
-  HttpGetDiff(NessieApiClient client) {
-    super(client);
-  }
-
-  @Override
-  public GetDiffBuilder fromRefName(String fromRefName) {
-    builder.fromRef(fromRefName);
-    return this;
-  }
-
-  @Override
-  public GetDiffBuilder fromHashOnRef(String fromHashOnRef) {
-    builder.fromHashOnRef(fromHashOnRef);
-    return this;
-  }
-
-  @Override
-  public GetDiffBuilder toRefName(String toRefName) {
-    builder.toRef(toRefName);
-    return this;
-  }
-
-  @Override
-  public GetDiffBuilder toHashOnRef(String toHashOnRef) {
-    builder.toHashOnRef(toHashOnRef);
-    return this;
+  HttpGetDiff(HttpDiffApi api) {
+    this.api = api;
   }
 
   @Override
   public DiffResponse get() throws NessieNotFoundException {
-    return client.getDiffApi().getDiff(builder.build());
+    DiffParamsBuilder builder =
+        DiffParams.builder()
+            .fromRef(fromRefName)
+            .fromHashOnRef(fromHashOnRef)
+            .toRef(toRefName)
+            .toHashOnRef(toHashOnRef);
+    return api.getDiff(builder.build());
   }
 }

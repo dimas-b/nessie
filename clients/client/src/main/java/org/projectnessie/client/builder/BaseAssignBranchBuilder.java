@@ -13,24 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.projectnessie.client.http.v1api;
+package org.projectnessie.client.builder;
 
-import org.projectnessie.apiv1.http.HttpTreeApi;
-import org.projectnessie.client.builder.BaseAssignTagBuilder;
-import org.projectnessie.error.NessieConflictException;
-import org.projectnessie.error.NessieNotFoundException;
+import org.projectnessie.client.api.AssignBranchBuilder;
 import org.projectnessie.model.Reference;
 
-final class HttpAssignTag extends BaseAssignTagBuilder {
-
-  private final HttpTreeApi api;
-
-  HttpAssignTag(HttpTreeApi api) {
-    this.api = api;
-  }
+public abstract class BaseAssignBranchBuilder extends BaseOnBranchRequest<AssignBranchBuilder>
+    implements AssignBranchBuilder {
+  protected Reference assignTo;
 
   @Override
-  public void assign() throws NessieNotFoundException, NessieConflictException {
-    api.assignReference(Reference.ReferenceType.TAG, tagName, hash, assignTo);
+  public AssignBranchBuilder assignTo(Reference assignTo) {
+    this.assignTo = assignTo;
+    return this;
   }
 }

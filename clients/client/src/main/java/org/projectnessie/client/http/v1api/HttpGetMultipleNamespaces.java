@@ -15,51 +15,28 @@
  */
 package org.projectnessie.client.http.v1api;
 
-import javax.annotation.Nullable;
+import org.projectnessie.apiv1.http.HttpNamespaceApi;
 import org.projectnessie.apiv1.params.MultipleNamespacesParams;
-import org.projectnessie.apiv1.params.MultipleNamespacesParamsBuilder;
-import org.projectnessie.client.api.GetMultipleNamespacesBuilder;
-import org.projectnessie.client.http.NessieApiClient;
+import org.projectnessie.client.builder.BaseGetMultipleNamespacesBuilder;
 import org.projectnessie.error.NessieReferenceNotFoundException;
 import org.projectnessie.model.GetNamespacesResponse;
-import org.projectnessie.model.Namespace;
 
-final class HttpGetMultipleNamespaces extends BaseHttpRequest
-    implements GetMultipleNamespacesBuilder {
+final class HttpGetMultipleNamespaces extends BaseGetMultipleNamespacesBuilder {
 
-  private final MultipleNamespacesParamsBuilder builder = MultipleNamespacesParams.builder();
+  private final HttpNamespaceApi api;
 
-  HttpGetMultipleNamespaces(NessieApiClient client) {
-    super(client);
-  }
-
-  /**
-   * The namespace prefix to search for.
-   *
-   * @param namespace The namespace prefix to search for
-   * @return this
-   */
-  @Override
-  public GetMultipleNamespacesBuilder namespace(Namespace namespace) {
-    builder.namespace(namespace);
-    return this;
-  }
-
-  @Override
-  public GetMultipleNamespacesBuilder refName(String refName) {
-    builder.refName(refName);
-    return this;
-  }
-
-  @Override
-  public GetMultipleNamespacesBuilder hashOnRef(@Nullable String hashOnRef) {
-    builder.hashOnRef(hashOnRef);
-    return this;
+  HttpGetMultipleNamespaces(HttpNamespaceApi api) {
+    this.api = api;
   }
 
   @Override
   public GetNamespacesResponse get() throws NessieReferenceNotFoundException {
-    MultipleNamespacesParams build = builder.build();
-    return client.getNamespaceApi().getNamespaces(build);
+    MultipleNamespacesParams build =
+        MultipleNamespacesParams.builder()
+            .namespace(namespace)
+            .refName(refName)
+            .hashOnRef(hashOnRef)
+            .build();
+    return api.getNamespaces(build);
   }
 }

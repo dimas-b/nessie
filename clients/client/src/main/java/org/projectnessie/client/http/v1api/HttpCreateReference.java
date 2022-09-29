@@ -15,35 +15,22 @@
  */
 package org.projectnessie.client.http.v1api;
 
-import org.projectnessie.client.api.CreateReferenceBuilder;
-import org.projectnessie.client.http.NessieApiClient;
+import org.projectnessie.apiv1.http.HttpTreeApi;
+import org.projectnessie.client.builder.BaseCreateReferenceBuilder;
 import org.projectnessie.error.NessieConflictException;
 import org.projectnessie.error.NessieNotFoundException;
 import org.projectnessie.model.Reference;
 
-final class HttpCreateReference extends BaseHttpRequest implements CreateReferenceBuilder {
+final class HttpCreateReference extends BaseCreateReferenceBuilder {
 
-  private Reference reference;
-  private String sourceRefName;
+  private final HttpTreeApi api;
 
-  HttpCreateReference(NessieApiClient client) {
-    super(client);
-  }
-
-  @Override
-  public CreateReferenceBuilder sourceRefName(String sourceRefName) {
-    this.sourceRefName = sourceRefName;
-    return this;
-  }
-
-  @Override
-  public CreateReferenceBuilder reference(Reference reference) {
-    this.reference = reference;
-    return this;
+  HttpCreateReference(HttpTreeApi api) {
+    this.api = api;
   }
 
   @Override
   public Reference create() throws NessieNotFoundException, NessieConflictException {
-    return client.getTreeApi().createReference(sourceRefName, reference);
+    return api.createReference(sourceRefName, reference);
   }
 }

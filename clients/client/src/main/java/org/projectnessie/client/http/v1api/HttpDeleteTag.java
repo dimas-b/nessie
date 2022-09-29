@@ -15,21 +15,23 @@
  */
 package org.projectnessie.client.http.v1api;
 
+import org.projectnessie.apiv1.http.HttpTreeApi;
 import org.projectnessie.client.api.DeleteTagBuilder;
-import org.projectnessie.client.http.NessieApiClient;
+import org.projectnessie.client.builder.BaseOnTagRequest;
 import org.projectnessie.error.NessieConflictException;
 import org.projectnessie.error.NessieNotFoundException;
 import org.projectnessie.model.Reference;
 
-final class HttpDeleteTag extends BaseHttpOnTagRequest<DeleteTagBuilder>
-    implements DeleteTagBuilder {
+final class HttpDeleteTag extends BaseOnTagRequest<DeleteTagBuilder> implements DeleteTagBuilder {
 
-  HttpDeleteTag(NessieApiClient client) {
-    super(client);
+  private final HttpTreeApi api;
+
+  HttpDeleteTag(HttpTreeApi api) {
+    this.api = api;
   }
 
   @Override
   public void delete() throws NessieConflictException, NessieNotFoundException {
-    client.getTreeApi().deleteReference(Reference.ReferenceType.TAG, tagName, hash);
+    api.deleteReference(Reference.ReferenceType.TAG, tagName, hash);
   }
 }

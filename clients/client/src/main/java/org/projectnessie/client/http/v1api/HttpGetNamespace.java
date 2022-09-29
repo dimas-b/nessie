@@ -15,43 +15,26 @@
  */
 package org.projectnessie.client.http.v1api;
 
-import javax.annotation.Nullable;
+import org.projectnessie.apiv1.http.HttpNamespaceApi;
 import org.projectnessie.apiv1.params.NamespaceParams;
 import org.projectnessie.apiv1.params.NamespaceParamsBuilder;
-import org.projectnessie.client.api.GetNamespaceBuilder;
-import org.projectnessie.client.http.NessieApiClient;
+import org.projectnessie.client.builder.BaseGetNamespaceBuilder;
 import org.projectnessie.error.NessieNamespaceNotFoundException;
 import org.projectnessie.error.NessieReferenceNotFoundException;
 import org.projectnessie.model.Namespace;
 
-final class HttpGetNamespace extends BaseHttpRequest implements GetNamespaceBuilder {
+final class HttpGetNamespace extends BaseGetNamespaceBuilder {
 
-  private final NamespaceParamsBuilder builder = NamespaceParams.builder();
+  private final HttpNamespaceApi api;
 
-  HttpGetNamespace(NessieApiClient client) {
-    super(client);
-  }
-
-  @Override
-  public HttpGetNamespace namespace(Namespace namespace) {
-    builder.namespace(namespace);
-    return this;
-  }
-
-  @Override
-  public HttpGetNamespace refName(String refName) {
-    builder.refName(refName);
-    return this;
-  }
-
-  @Override
-  public GetNamespaceBuilder hashOnRef(@Nullable String hashOnRef) {
-    builder.hashOnRef(hashOnRef);
-    return this;
+  HttpGetNamespace(HttpNamespaceApi api) {
+    this.api = api;
   }
 
   @Override
   public Namespace get() throws NessieNamespaceNotFoundException, NessieReferenceNotFoundException {
-    return client.getNamespaceApi().getNamespace(builder.build());
+    NamespaceParamsBuilder builder =
+        NamespaceParams.builder().namespace(namespace).refName(refName).hashOnRef(hashOnRef);
+    return api.getNamespace(builder.build());
   }
 }

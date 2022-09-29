@@ -13,29 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.projectnessie.client.http.v1api;
+package org.projectnessie.client.builder;
 
-import org.projectnessie.client.api.OnBranchBuilder;
-import org.projectnessie.client.http.NessieApiClient;
+import org.projectnessie.client.api.AssignTagBuilder;
+import org.projectnessie.model.Reference;
 
-abstract class BaseHttpOnBranchRequest<R extends OnBranchBuilder<R>> extends BaseHttpRequest
-    implements OnBranchBuilder<R> {
-  protected String branchName;
-  protected String hash;
+public abstract class BaseAssignTagBuilder extends BaseOnTagRequest<AssignTagBuilder>
+    implements AssignTagBuilder {
 
-  BaseHttpOnBranchRequest(NessieApiClient client) {
-    super(client);
-  }
+  protected Reference assignTo;
 
   @Override
-  public R branchName(String branchName) {
-    this.branchName = branchName;
-    return (R) this;
-  }
-
-  @Override
-  public R hash(String hash) {
-    this.hash = hash;
-    return (R) this;
+  public AssignTagBuilder assignTo(Reference assignTo) {
+    this.assignTo = assignTo;
+    return this;
   }
 }
