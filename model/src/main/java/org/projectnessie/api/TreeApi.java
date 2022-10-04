@@ -15,6 +15,7 @@
  */
 package org.projectnessie.api;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -26,8 +27,10 @@ import org.projectnessie.api.params.ReferencesParams;
 import org.projectnessie.error.NessieConflictException;
 import org.projectnessie.error.NessieNotFoundException;
 import org.projectnessie.model.Branch;
+import org.projectnessie.model.CommitResponse;
 import org.projectnessie.model.Content;
 import org.projectnessie.model.ContentKey;
+import org.projectnessie.model.ContentResponse;
 import org.projectnessie.model.DiffResponse;
 import org.projectnessie.model.EntriesResponse;
 import org.projectnessie.model.GetMultipleContentsRequest;
@@ -38,6 +41,7 @@ import org.projectnessie.model.MergeResponse;
 import org.projectnessie.model.Operations;
 import org.projectnessie.model.Reference;
 import org.projectnessie.model.ReferencesResponse;
+import org.projectnessie.model.SingleReferenceResponse;
 import org.projectnessie.model.Transplant;
 import org.projectnessie.model.Validation;
 
@@ -63,9 +67,6 @@ public interface TreeApi {
    */
   ReferencesResponse getAllReferences(ReferencesParams params);
 
-  /** Get details for the default reference. */
-  Branch getDefaultBranch() throws NessieNotFoundException;
-
   /**
    * Create a new reference.
    *
@@ -80,17 +81,19 @@ public interface TreeApi {
    * <p>Specifying no {@link Reference#getHash()} means that the new reference will be created "at
    * the beginning of time".
    */
-  Reference createReference(
+  SingleReferenceResponse createReference(
       @Valid
           @NotNull
-          @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)
+          @Pattern(
+              regexp = Validation.REF_NAME_PATH_REGEX,
+              message = Validation.REF_NAME_PATH_MESSAGE)
           String name,
       @Valid @NotNull Reference.ReferenceType type,
-      @Valid @NotNull Reference sourceRef)
+      @Valid @Nullable Reference sourceRef)
       throws NessieNotFoundException, NessieConflictException;
 
   /** Get details of a particular ref, if it exists. */
-  Reference getReferenceByName(@Valid @NotNull GetReferenceParams params)
+  SingleReferenceResponse getReferenceByName(@Valid @NotNull GetReferenceParams params)
       throws NessieNotFoundException;
 
   /**
@@ -114,7 +117,9 @@ public interface TreeApi {
   EntriesResponse getEntries(
       @Valid
           @NotNull
-          @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)
+          @Pattern(
+              regexp = Validation.REF_NAME_PATH_REGEX,
+              message = Validation.REF_NAME_PATH_MESSAGE)
           String refName,
       @Valid @NotNull EntriesParams params)
       throws NessieNotFoundException;
@@ -139,7 +144,9 @@ public interface TreeApi {
   LogResponse getCommitLog(
       @Valid
           @NotNull
-          @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)
+          @Pattern(
+              regexp = Validation.REF_NAME_PATH_REGEX,
+              message = Validation.REF_NAME_PATH_MESSAGE)
           String ref,
       @Valid @NotNull CommitLogParams params)
       throws NessieNotFoundException;
@@ -157,11 +164,13 @@ public interface TreeApi {
    *
    * @param type Optional expected type of reference being assigned. Will be validated if present.
    */
-  void assignReference(
+  SingleReferenceResponse assignReference(
       @Valid Reference.ReferenceType type,
       @Valid
           @NotNull
-          @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)
+          @Pattern(
+              regexp = Validation.REF_NAME_PATH_REGEX,
+              message = Validation.REF_NAME_PATH_MESSAGE)
           String reference,
       @Valid @NotNull Reference assignTo)
       throws NessieNotFoundException, NessieConflictException;
@@ -171,11 +180,13 @@ public interface TreeApi {
    *
    * @param type Optional expected type of reference being deleted. Will be validated if present.
    */
-  void deleteReference(
+  SingleReferenceResponse deleteReference(
       @Valid Reference.ReferenceType type,
       @Valid
           @NotNull
-          @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)
+          @Pattern(
+              regexp = Validation.REF_NAME_PATH_REGEX,
+              message = Validation.REF_NAME_PATH_MESSAGE)
           String reference)
       throws NessieConflictException, NessieNotFoundException;
 
@@ -183,7 +194,9 @@ public interface TreeApi {
   MergeResponse transplantCommitsIntoBranch(
       @Valid
           @NotNull
-          @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)
+          @Pattern(
+              regexp = Validation.REF_NAME_PATH_REGEX,
+              message = Validation.REF_NAME_PATH_MESSAGE)
           String branch,
       @Valid Transplant transplant)
       throws NessieNotFoundException, NessieConflictException;
@@ -192,7 +205,9 @@ public interface TreeApi {
   MergeResponse mergeRefIntoBranch(
       @Valid
           @NotNull
-          @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)
+          @Pattern(
+              regexp = Validation.REF_NAME_PATH_REGEX,
+              message = Validation.REF_NAME_PATH_MESSAGE)
           String branch,
       @Valid @NotNull Merge merge)
       throws NessieNotFoundException, NessieConflictException;
@@ -209,10 +224,12 @@ public interface TreeApi {
    * @throws NessieConflictException if the operations could not be applied to some conflict, which
    *     is either caused by a conflicting commit or concurrent commits.
    */
-  Branch commitMultipleOperations(
+  CommitResponse commitMultipleOperations(
       @Valid
           @NotNull
-          @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)
+          @Pattern(
+              regexp = Validation.REF_NAME_PATH_REGEX,
+              message = Validation.REF_NAME_PATH_MESSAGE)
           String branch,
       @Valid @NotNull Operations operations)
       throws NessieNotFoundException, NessieConflictException;
@@ -231,9 +248,12 @@ public interface TreeApi {
    * @return list of {@link GetMultipleContentsResponse.ContentWithKey}s
    * @throws NessieNotFoundException if {@code ref} or {@code hashOnRef} does not exist
    */
-  Content getContent(
+  ContentResponse getContent(
       @Valid ContentKey key,
-      @Valid @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)
+      @Valid
+          @Pattern(
+              regexp = Validation.REF_NAME_PATH_REGEX,
+              message = Validation.REF_NAME_PATH_MESSAGE)
           String ref)
       throws NessieNotFoundException;
 
@@ -253,7 +273,10 @@ public interface TreeApi {
    * @throws NessieNotFoundException if {@code ref} or {@code hashOnRef} does not exist
    */
   GetMultipleContentsResponse getMultipleContents(
-      @Valid @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)
+      @Valid
+          @Pattern(
+              regexp = Validation.REF_NAME_PATH_REGEX,
+              message = Validation.REF_NAME_PATH_MESSAGE)
           String ref,
       @Valid @NotNull GetMultipleContentsRequest request)
       throws NessieNotFoundException;

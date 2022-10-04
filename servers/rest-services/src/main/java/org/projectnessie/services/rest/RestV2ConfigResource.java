@@ -13,26 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.projectnessie.services.impl;
+package org.projectnessie.services.rest;
 
-import org.projectnessie.api.ConfigApi;
-import org.projectnessie.model.ImmutableNessieConfiguration;
-import org.projectnessie.model.NessieConfiguration;
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+import javax.ws.rs.Path;
 import org.projectnessie.services.config.ServerConfig;
 
-public class ConfigApiImpl implements ConfigApi {
+/** REST endpoint to retrieve server settings. */
+@RequestScoped
+@Path("v2/config")
+public class RestV2ConfigResource extends RestConfigResource {
 
-  private final ServerConfig config;
-
-  public ConfigApiImpl(ServerConfig config) {
-    this.config = config;
+  // Mandated by CDI 2.0
+  public RestV2ConfigResource() {
+    this(null);
   }
 
-  @Override
-  public NessieConfiguration getConfig() {
-    return ImmutableNessieConfiguration.builder()
-        .defaultBranch(this.config.getDefaultBranch())
-        .maxSupportedApiVersion(2)
-        .build();
+  @Inject
+  public RestV2ConfigResource(ServerConfig config) {
+    super(config);
   }
 }

@@ -60,6 +60,8 @@ import org.projectnessie.services.rest.RestDiffResource;
 import org.projectnessie.services.rest.RestNamespaceResource;
 import org.projectnessie.services.rest.RestRefLogResource;
 import org.projectnessie.services.rest.RestTreeResource;
+import org.projectnessie.services.rest.RestV2ConfigResource;
+import org.projectnessie.services.rest.RestV2TreeResource;
 import org.projectnessie.services.rest.ValidationExceptionMapper;
 import org.projectnessie.versioned.PersistVersionStoreExtension;
 import org.projectnessie.versioned.persist.adapter.DatabaseAdapter;
@@ -141,6 +143,8 @@ public class NessieJaxRsExtension
     }
 
     if (parameterContext.isAnnotated(NessieUri.class)) {
+      // Inject the historical v1 API URL.
+      // Version-aware tests are expected to re-resolve it as appropriate.
       return env.jerseyTest.target().getUri().resolve("v1");
     }
 
@@ -200,6 +204,8 @@ public class NessieJaxRsExtension
             @Override
             protected Application configure() {
               ResourceConfig config = new ResourceConfig();
+              config.register(RestV2ConfigResource.class);
+              config.register(RestV2TreeResource.class);
               config.register(RestConfigResource.class);
               config.register(RestTreeResource.class);
               config.register(RestContentResource.class);

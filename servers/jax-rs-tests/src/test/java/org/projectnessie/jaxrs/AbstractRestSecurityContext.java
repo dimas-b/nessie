@@ -103,6 +103,8 @@ public abstract class AbstractRestSecurityContext extends AbstractRestAccessChec
   @Test
   public void committerAndAuthorMergeUnsquashed(
       @NessieSecurityContext Consumer<SecurityContext> secContext) throws Exception {
+    assumeApiV1();
+
     Branch main = makeCommits(createBranch("committerAndAuthorMergeUnsquashed_main"), secContext);
     Branch merge = createBranch("committerAndAuthorMergeUnsquashed_target");
 

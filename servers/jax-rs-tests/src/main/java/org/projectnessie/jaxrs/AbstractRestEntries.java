@@ -275,6 +275,8 @@ public abstract class AbstractRestEntries extends AbstractRestDiff {
   @EnumSource(ReferenceMode.class)
   public void filterEntriesByNamespaceAndPrefixDepth(ReferenceMode refMode)
       throws BaseNessieClientServerException {
+    assumeApiV1();
+
     Branch branch = createBranch("filterEntriesByNamespaceAndPrefixDepth");
     ContentKey first = ContentKey.of("a", "b", "c", "firstTable");
     ContentKey second = ContentKey.of("a", "b", "c", "secondTable");

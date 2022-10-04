@@ -20,6 +20,7 @@ import static org.projectnessie.model.Validation.validateHash;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.util.List;
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
@@ -53,7 +54,7 @@ import org.immutables.value.Value;
 public interface Transplant extends BaseMergeTransplant {
 
   @Override
-  @NotNull
+  @Nullable
   @Size(min = 1)
   String getMessage();
 

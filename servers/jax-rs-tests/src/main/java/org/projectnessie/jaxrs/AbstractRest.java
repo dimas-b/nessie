@@ -22,7 +22,9 @@ import java.net.URI;
 import java.util.Locale;
 import java.util.Objects;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assumptions;
 import org.projectnessie.client.api.NessieApiV1;
+import org.projectnessie.client.api.NessieApiV2;
 import org.projectnessie.client.http.HttpClientBuilder;
 import org.projectnessie.error.BaseNessieClientServerException;
 import org.projectnessie.error.NessieConflictException;
@@ -51,7 +53,8 @@ public abstract class AbstractRest {
   }
 
   protected void initApi(URI nessieApiUri) {
-    NessieApiV1 api = HttpClientBuilder.builder().withUri(nessieApiUri).build(NessieApiV1.class);
+    NessieApiV1 api =
+        HttpClientBuilder.builder().withUri(nessieApiUri.resolve("v2")).build(NessieApiV2.class);
     initApi(api);
   }
 
@@ -80,6 +83,10 @@ public abstract class AbstractRest {
               }
             });
     api.close();
+  }
+
+  public void assumeApiV1() {
+    Assumptions.assumeFalse(getApi() instanceof NessieApiV2);
   }
 
   protected String createCommits(

@@ -27,13 +27,13 @@ public class DiffParams {
   public static final String HASH_OPTIONAL_REGEX = "(" + Validation.HASH_REGEX + ")?";
 
   @NotNull
-  @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)
+  @Pattern(regexp = Validation.REF_NAME_PATH_REGEX, message = Validation.REF_NAME_PATH_MESSAGE)
   @Parameter(ref = "refPathFromParameter")
   @PathParam("from-ref")
   private String fromRef;
 
   @NotNull
-  @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)
+  @Pattern(regexp = Validation.REF_NAME_PATH_REGEX, message = Validation.REF_NAME_PATH_MESSAGE)
   @Parameter(ref = "refPathToParameter")
   @PathParam("to-ref")
   private String toRef;

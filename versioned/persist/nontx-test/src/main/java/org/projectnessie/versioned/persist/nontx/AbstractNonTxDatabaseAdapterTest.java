@@ -101,7 +101,7 @@ public abstract class AbstractNonTxDatabaseAdapterTest extends AbstractDatabaseA
   @ParameterizedTest
   @ValueSource(ints = {10, 100, 200, 1000})
   void migrateNamedReferencesFromGlobalPointer(int numNamedRefs) throws Exception {
-    assumeThat(numNamedRefs <= 200 || !(this instanceof LongerCommitTimeouts)).isTrue();
+    assumeThat(numNamedRefs <= 200 || !(this instanceof LongerCommitTimeouts)).isFalse();
 
     NonTransactionalDatabaseAdapter<?> nontx = (NonTransactionalDatabaseAdapter<?>) databaseAdapter;
     int numThreads = 3;

@@ -45,6 +45,9 @@ import org.projectnessie.model.Tag;
 public abstract class AbstractRestRefLog extends AbstractRestReferences {
   @Test
   public void testReflog() throws BaseNessieClientServerException {
+    // API v2 does not support reflog
+    assumeApiV1();
+
     String tagName = "tag1_test_reflog_" + ThreadLocalRandom.current().nextInt();
     String branch1 = "branch1_test_reflog";
     String branch2 = "branch2_test_reflog";

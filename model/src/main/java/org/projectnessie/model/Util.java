@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import org.projectnessie.model.types.ContentTypes;
 
 final class Util {
@@ -59,6 +60,51 @@ final class Util {
     return elements.stream()
         .map(x -> x.replace(DOT, GROUP_SEPARATOR).replace(ZERO_BYTE, GROUP_SEPARATOR))
         .collect(Collectors.joining("."));
+  }
+
+  public static String toPathStringRef(String name, String hash) {
+    StringBuilder builder = new StringBuilder();
+    if (name != null) {
+      builder.append(name);
+    }
+
+    if (hash != null) {
+      builder.append("@");
+      builder.append(hash);
+    }
+    return builder.toString();
+  }
+
+  public static Reference fromPathStringRef(
+      @Nonnull String value, @Nonnull Reference.ReferenceType namedRefType) {
+    String name = null;
+    String hash = null;
+    int hashIdx = value.indexOf("@");
+
+    if (hashIdx > 0) {
+      name = value.substring(0, hashIdx);
+    }
+
+    if (hashIdx < 0) {
+      name = value;
+    }
+
+    if (hashIdx >= 0) {
+      hash = value.substring(hashIdx + 1);
+    }
+
+    if (name == null) {
+      return Detached.of(hash);
+    } else {
+      switch (namedRefType) {
+        case TAG:
+          return Tag.of(name, hash);
+        case BRANCH:
+          return Branch.of(name, hash);
+        default:
+          throw new IllegalArgumentException("Unsupported reference type: " + namedRefType);
+      }
+    }
   }
 
   static final class ContentTypeDeserializer extends JsonDeserializer<Content.Type> {

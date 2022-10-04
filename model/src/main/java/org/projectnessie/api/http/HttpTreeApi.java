@@ -45,7 +45,9 @@ import org.projectnessie.api.params.ReferencesParams;
 import org.projectnessie.error.NessieConflictException;
 import org.projectnessie.error.NessieNotFoundException;
 import org.projectnessie.model.Branch;
+import org.projectnessie.model.CommitResponse;
 import org.projectnessie.model.ContentKey;
+import org.projectnessie.model.ContentResponse;
 import org.projectnessie.model.DiffResponse;
 import org.projectnessie.model.EntriesResponse;
 import org.projectnessie.model.GetMultipleContentsRequest;
@@ -57,6 +59,7 @@ import org.projectnessie.model.MergeResponse;
 import org.projectnessie.model.Operations;
 import org.projectnessie.model.Reference;
 import org.projectnessie.model.ReferencesResponse;
+import org.projectnessie.model.SingleReferenceResponse;
 import org.projectnessie.model.Transplant;
 
 @Consumes(value = MediaType.APPLICATION_JSON)
@@ -116,7 +119,7 @@ public interface HttpTreeApi extends TreeApi {
         responseCode = "409",
         description = "Another reference with the same name already exists"),
   })
-  Reference createReference(
+  SingleReferenceResponse createReference(
       @Parameter(required = true, description = "New reference name") @QueryParam("name")
           String name,
       @Parameter(
@@ -156,7 +159,8 @@ public interface HttpTreeApi extends TreeApi {
     @APIResponse(responseCode = "403", description = "Not allowed to view the given reference"),
     @APIResponse(responseCode = "404", description = "Ref not found")
   })
-  Reference getReferenceByName(@BeanParam GetReferenceParams params) throws NessieNotFoundException;
+  SingleReferenceResponse getReferenceByName(@BeanParam GetReferenceParams params)
+      throws NessieNotFoundException;
 
   @Override
   @GET
@@ -326,7 +330,7 @@ public interface HttpTreeApi extends TreeApi {
         responseCode = "409",
         description = "Update conflict or expected hash / type mismatch")
   })
-  void assignReference(
+  SingleReferenceResponse assignReference(
       @Parameter(
               description = "Optional expected type of the reference being reassigned",
               examples = {@ExampleObject(ref = "referenceType")})
@@ -364,7 +368,7 @@ public interface HttpTreeApi extends TreeApi {
     @APIResponse(responseCode = "404", description = "Ref doesn't exists"),
     @APIResponse(responseCode = "409", description = "update conflict"),
   })
-  void deleteReference(
+  SingleReferenceResponse deleteReference(
       @Parameter(
               description = "Optional expected type of the reference being deleted",
               examples = {@ExampleObject(ref = "referenceType")})
@@ -400,7 +404,7 @@ public interface HttpTreeApi extends TreeApi {
         responseCode = "404",
         description = "Table not found on 'ref' or non-existent reference")
   })
-  org.projectnessie.model.Content getContent(
+  ContentResponse getContent(
       @Parameter(ref = "keyPathParameter") @PathParam("key") ContentKey key,
       @Parameter(ref = "refPathParameter") @PathParam("ref") String ref)
       throws NessieNotFoundException;
@@ -619,7 +623,7 @@ public interface HttpTreeApi extends TreeApi {
     @APIResponse(responseCode = "404", description = "Provided ref doesn't exists"),
     @APIResponse(responseCode = "409", description = "Update conflict")
   })
-  Branch commitMultipleOperations(
+  CommitResponse commitMultipleOperations(
       @Parameter(ref = "branchPathParameter") @PathParam("branch") String branch,
       @RequestBody(
               description = "Operations to commit",
