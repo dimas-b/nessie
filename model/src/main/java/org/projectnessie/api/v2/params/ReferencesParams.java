@@ -15,8 +15,6 @@
  */
 package org.projectnessie.api.v2.params;
 
-import java.util.Objects;
-import java.util.StringJoiner;
 import javax.annotation.Nullable;
 import javax.ws.rs.QueryParam;
 import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
@@ -102,35 +100,5 @@ public class ReferencesParams extends AbstractParams<ReferencesParams> {
   @Override
   public ReferencesParams forNextPage(String pageToken) {
     return new ReferencesParams(maxRecords(), pageToken, fetchOption, filter);
-  }
-
-  @Override
-  public String toString() {
-    return new StringJoiner(", ", ReferencesParams.class.getSimpleName() + "[", "]")
-        .add("maxRecords=" + maxRecords())
-        .add("pageToken='" + pageToken() + "'")
-        .add("fetchOption=" + fetchOption)
-        .add("filter=" + filter)
-        .toString();
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof ReferencesParams)) {
-      return false;
-    }
-    ReferencesParams that = (ReferencesParams) o;
-    return Objects.equals(maxRecords(), that.maxRecords())
-        && Objects.equals(pageToken(), that.pageToken())
-        && fetchOption == that.fetchOption
-        && Objects.equals(filter, that.filter);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(maxRecords(), pageToken(), fetchOption, filter);
   }
 }

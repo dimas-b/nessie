@@ -15,7 +15,6 @@
  */
 package org.projectnessie.api.v2.params;
 
-import java.util.Objects;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.ws.rs.PathParam;
@@ -24,8 +23,6 @@ import org.immutables.builder.Builder.Constructor;
 import org.projectnessie.model.Validation;
 
 public class DiffParams {
-
-  public static final String HASH_OPTIONAL_REGEX = "(" + Validation.HASH_REGEX + ")?";
 
   @NotNull
   @Pattern(regexp = Validation.REF_NAME_PATH_REGEX, message = Validation.REF_NAME_PATH_MESSAGE)
@@ -57,22 +54,5 @@ public class DiffParams {
 
   public static DiffParamsBuilder builder() {
     return new DiffParamsBuilder();
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof DiffParams)) {
-      return false;
-    }
-    DiffParams that = (DiffParams) o;
-    return Objects.equals(fromRef, that.fromRef) && Objects.equals(toRef, that.toRef);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(fromRef, toRef);
   }
 }

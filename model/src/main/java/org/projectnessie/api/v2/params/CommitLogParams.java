@@ -15,8 +15,6 @@
  */
 package org.projectnessie.api.v2.params;
 
-import java.util.Objects;
-import java.util.StringJoiner;
 import javax.annotation.Nullable;
 import javax.validation.constraints.Pattern;
 import javax.ws.rs.QueryParam;
@@ -112,37 +110,5 @@ public class CommitLogParams extends AbstractParams<CommitLogParams> {
   @Override
   public CommitLogParams forNextPage(String pageToken) {
     return new CommitLogParams(startHash, maxRecords(), pageToken, filter, fetchOption);
-  }
-
-  @Override
-  public String toString() {
-    return new StringJoiner(", ", CommitLogParams.class.getSimpleName() + "[", "]")
-        .add("startHash='" + startHash + "'")
-        .add("maxRecords=" + maxRecords())
-        .add("pageToken='" + pageToken() + "'")
-        .add("filter='" + filter + "'")
-        .add("fetchOption='" + fetchOption + "'")
-        .toString();
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof CommitLogParams)) {
-      return false;
-    }
-    CommitLogParams that = (CommitLogParams) o;
-    return Objects.equals(startHash, that.startHash)
-        && Objects.equals(maxRecords(), that.maxRecords())
-        && Objects.equals(pageToken(), that.pageToken())
-        && Objects.equals(filter, that.filter)
-        && fetchOption == that.fetchOption;
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(startHash, maxRecords(), pageToken(), filter, fetchOption);
   }
 }

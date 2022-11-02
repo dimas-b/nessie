@@ -15,8 +15,6 @@
  */
 package org.projectnessie.api.v2.params;
 
-import java.util.Objects;
-import java.util.StringJoiner;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -69,30 +67,5 @@ public class GetReferenceParams {
 
   public static GetReferenceParamsBuilder builder() {
     return new GetReferenceParamsBuilder();
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof GetReferenceParams)) {
-      return false;
-    }
-    GetReferenceParams that = (GetReferenceParams) o;
-    return fetchOption == that.fetchOption && Objects.equals(refName, that.refName);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(refName, fetchOption);
-  }
-
-  @Override
-  public String toString() {
-    return new StringJoiner(", ", GetReferenceParams.class.getSimpleName() + "[", "]")
-        .add("refName='" + refName + "'")
-        .add("fetchOption=" + fetchOption)
-        .toString();
   }
 }

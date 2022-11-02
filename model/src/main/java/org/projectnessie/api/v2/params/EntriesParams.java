@@ -15,8 +15,6 @@
  */
 package org.projectnessie.api.v2.params;
 
-import java.util.Objects;
-import java.util.StringJoiner;
 import javax.annotation.Nullable;
 import javax.ws.rs.QueryParam;
 import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
@@ -69,33 +67,5 @@ public class EntriesParams extends AbstractParams<EntriesParams> {
   @Override
   public EntriesParams forNextPage(String pageToken) {
     return new EntriesParams(maxRecords(), pageToken, filter);
-  }
-
-  @Override
-  public String toString() {
-    return new StringJoiner(", ", EntriesParams.class.getSimpleName() + "[", "]")
-        .add("maxRecords=" + maxRecords())
-        .add("pageToken='" + pageToken() + "'")
-        .add("filter='" + filter + "'")
-        .toString();
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof EntriesParams)) {
-      return false;
-    }
-    EntriesParams that = (EntriesParams) o;
-    return Objects.equals(maxRecords(), that.maxRecords())
-        && Objects.equals(pageToken(), that.pageToken())
-        && Objects.equals(filter, that.filter);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(maxRecords(), pageToken(), filter);
   }
 }
