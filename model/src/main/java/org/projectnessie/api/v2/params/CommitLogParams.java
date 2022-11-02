@@ -22,6 +22,7 @@ import javax.validation.constraints.Pattern;
 import javax.ws.rs.QueryParam;
 import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.immutables.builder.Builder.Constructor;
 import org.projectnessie.api.params.FetchOption;
 import org.projectnessie.model.Validation;
 
@@ -72,7 +73,7 @@ public class CommitLogParams extends AbstractParams<CommitLogParams> {
 
   public CommitLogParams() {}
 
-  @org.immutables.builder.Builder.Constructor
+  @Constructor
   CommitLogParams(
       @Nullable String startHash,
       @Nullable Integer maxRecords,

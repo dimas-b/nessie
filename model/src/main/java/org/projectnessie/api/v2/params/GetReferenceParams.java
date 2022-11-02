@@ -23,7 +23,7 @@ import javax.validation.constraints.Pattern;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
-import org.immutables.builder.Builder;
+import org.immutables.builder.Builder.Constructor;
 import org.projectnessie.api.params.FetchOption;
 import org.projectnessie.model.Validation;
 
@@ -52,7 +52,7 @@ public class GetReferenceParams {
 
   public GetReferenceParams() {}
 
-  @Builder.Constructor
+  @Constructor
   GetReferenceParams(@NotNull String refName, @Nullable FetchOption fetchOption) {
     this.refName = refName;
     this.fetchOption = fetchOption;

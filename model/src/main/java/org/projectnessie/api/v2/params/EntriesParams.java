@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
 import javax.ws.rs.QueryParam;
 import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.immutables.builder.Builder.Constructor;
 
 /**
  * The purpose of this class is to include optional parameters that can be passed to {@code
@@ -46,7 +47,7 @@ public class EntriesParams extends AbstractParams<EntriesParams> {
 
   public EntriesParams() {}
 
-  @org.immutables.builder.Builder.Constructor
+  @Constructor
   EntriesParams(@Nullable Integer maxRecords, @Nullable String pageToken, @Nullable String filter) {
     super(maxRecords, pageToken);
     this.filter = filter;

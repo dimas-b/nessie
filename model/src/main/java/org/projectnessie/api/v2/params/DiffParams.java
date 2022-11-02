@@ -20,6 +20,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.ws.rs.PathParam;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.immutables.builder.Builder.Constructor;
 import org.projectnessie.model.Validation;
 
 public class DiffParams {
@@ -40,7 +41,7 @@ public class DiffParams {
 
   public DiffParams() {}
 
-  @org.immutables.builder.Builder.Constructor
+  @Constructor
   DiffParams(@NotNull String fromRef, @NotNull String toRef) {
     this.fromRef = fromRef;
     this.toRef = toRef;
