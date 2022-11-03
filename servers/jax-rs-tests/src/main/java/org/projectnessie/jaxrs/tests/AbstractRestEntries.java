@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.projectnessie.client.ext.NessieApiVersion;
+import org.projectnessie.client.ext.NessieApiVersions;
 import org.projectnessie.error.BaseNessieClientServerException;
 import org.projectnessie.error.NessieNamespaceAlreadyExistsException;
 import org.projectnessie.error.NessieNamespaceNotEmptyException;
@@ -273,6 +275,7 @@ public abstract class AbstractRestEntries extends AbstractRestDiff {
 
   @ParameterizedTest
   @EnumSource(ReferenceMode.class)
+  @NessieApiVersions(versions = NessieApiVersion.V1)
   public void filterEntriesByNamespaceAndPrefixDepth(ReferenceMode refMode)
       throws BaseNessieClientServerException {
     Branch branch = createBranch("filterEntriesByNamespaceAndPrefixDepth");

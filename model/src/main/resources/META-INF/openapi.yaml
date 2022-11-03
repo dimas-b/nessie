@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2020 Dremio
+# Copyright (C) 2022 Dremio
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,16 +28,196 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 
+tags:
+  - name: v1
+    description: End points from the legacy v1 API that are still supported in v2 API
+  - name: v2
+    description: End point from the Nessie v2 API
+
 paths: {} # inferred from java annotations
 
 components:
+  schemas:
+    keyMergeModes:
+      type: array
+      items:
+        $ref: '#/components/schemas/MergeKeyBehavior'
+      description: |
+        Specific merge behaviour requests by content key.
+        
+        The default is set by the `defaultKeyMergeMode` parameter.
+    defaultKeyMergeMode:
+      type:
+        $ref: '#/components/schemas/MergeBehavior'
+      description: |-
+        The default merge mode. If not set `NORMAL` is assumed.
+
+        This settings applies to key that are not explicitly mentioned in the `keyMergeModes` property.
+    dryRun:
+      type: boolean
+      description: When set to 'true' instructs the server to validate the request
+        but to avoid committing any changes.
+    fetchAdditionalInfo:
+      type: boolean
+      description: Whether to provide optional response data.
+    returnConflictAsResult:
+      type: boolean
+      description: When set to 'true' instructs the server to produce normal (non-error)
+        responses in case a conflict is detected and report conflict details in
+        the response payload.
+    fromRefName:
+      description: The name of the reference that contains the 'source' commits
+        for the requested merge or transplant operation.
+      pattern: "^[A-Za-z](((?![.][.])[A-Za-z0-9./_-])*[A-Za-z0-9_-])?$"
+      type: string
+
+  parameters:
+    refPathParameter: &refPathParam
+      name: "ref"
+      in: "path"
+      required: true
+      description: |
+        A reference to a particular version of the contents tree (a point in history). 
+        A reference can be specification in these forms:
+        - \- (literal minus character) - identifies the HEAD of the default branch 
+        - name - identifies the HEAD commit of a branch or tag
+        - name@hash - identifies the 'hash' commit on a branch or tag
+        - @hash - identifies the 'hash' commit in an unspecified branch or tag
+        
+        If both 'name' and 'hash' are given, 'hash' must be reachable from the current HEAD of the branch or tag.
+        If 'name' is omitted, the reference will be of type 'DETACHED' (referencing a specific commit hash without
+        claiming its reachability from any live HEAD). Using references of the last form may have authorization
+        implications when compared to an equivalent reference of the former forms.
+        
+        The 'name@hash' form always refers to the exact commit on a specific branch or tag. This is the most complete 
+        form of a reference. Other forms omit some of the details and require those gaps to be filled by the server at
+        runtime. Although these forms may be convenient to a human being, they may resolve differently at different
+        times depending on the state of the system. Using the full 'name@hash' form is recommended to avoid ambiguity.
+      schema:
+        pattern: "([^/]+|[^@]+@[^@/]*?)"
+        type: string
+      examples:
+        ref:
+          $ref: '#/components/examples/ref'
+        refWithHash:
+          $ref: '#/components/examples/refWithHash'
+        refDefault:
+          $ref: '#/components/examples/refDefault'
+        refDetached:
+          $ref: '#/components/examples/refDetached'
+
+    checkedRefParameter:
+      name: "ref"
+      in: "path"
+      required: true
+      description: |
+        Specifies a named branch or tag reference. 
+        A named reference can be specification in these forms:
+        - \- (literal minus character) - identifies the default branch 
+        - name - identifies a branch or tag without a concrete HEAD 'hash' value
+        - name@hash - identifies the 'hash' commit on a branch or tag
+        
+        If both 'name' and 'hash' are given, 'hash' must be the current HEAD of the branch or tag. It will be used to
+        validate that at execution time the reference points to the same hash that the caller expected when the
+        operation arguments were constructed.
+
+        Not specifying the 'hash' value relaxes server-side checks and can lead to unexpected side effects if multiple
+        changes to the same reference are executed concurrently. It is recommended to always specify the 'hash' value
+        when assigning or deleting a reference.
+        
+        Note that deleting the default branch may not be allowed.
+      schema:
+        pattern: "([^/]+|[^@]+@[^@/]*?)"
+        type: string
+      examples:
+        ref:
+          $ref: '#/components/examples/ref'
+        refWithHash:
+          $ref: '#/components/examples/refWithHash'
+        refDefault:
+          $ref: '#/components/examples/refDefault'
+
+    branchPathParameter:
+      name: "branch"
+      in: "path"
+      required: true
+      description: |
+        A reference to a particular version of the contents tree (a point in history) on a branch.
+        A reference can be specification in these forms:
+        - \- (literal minus character) - identifies the HEAD of the default branch 
+        - name - identifies the HEAD commit of a branch or tag
+        - name@hash - identifies the 'hash' commit on a branch or tag
+        
+        If both 'name' and 'hash' are given, 'hash' must be reachable from the current HEAD of the branch or tag.
+        In this case 'hash' indicates the state of contents that should be used for validating incoming changes
+        (commits / merges / transplants).
+        
+        Note that using the simple 'name' form will effectively disable content conflict checks and is
+        generally discouraged.
+        
+        The 'name@hash' form always refers to the exact commit on a specific branch. This is the most complete 
+        form of a reference. Other forms omit some of the details and require those gaps to be filled by the server at
+        runtime. Although these forms may be convenient to a human-being, they may resolve differently at different
+        times depending on the state of the system. Using the full 'name@hash' form is recommended to avoid ambiguity.
+      schema:
+        pattern: "([^/]+|[^@]+@[^@/]*?)"
+        type: string
+      examples:
+        ref:
+          $ref: '#/components/examples/ref'
+        refWithHash:
+          $ref: '#/components/examples/refWithHash'
+        refDefault:
+          $ref: '#/components/examples/refDefault'
+
+    refPathFromParameter:
+      <<: *refPathParam
+      name: from-ref
+
+    refPathToParameter:
+      <<: *refPathParam
+      name: to-ref
+      description: Same reference spec as in the 'from-ref' parameter but identifying the other tree for comparison.
+
+    keyPathParameter: &keyPathParam
+      name: "key"
+      in: "path"
+      required: true
+      description: |
+        The key to a content object. Key components (namespaces) are separated by the dot ('.') character. 
+        Dot ('.') characters that are not Nessie namespace separators must be encoded as the 'group separator' 
+        ASCII character (0x1D).
+      schema:
+        type: string
+      examples:
+        ContentKeyGet:
+          $ref: '#/components/examples/ContentKeyGet'
+
+    keyQueryParameter:
+      <<: *keyPathParam
+      in: "query"
+
+
   examples:
+    nessieConfig:
+      value:
+        defaultBranch: main
+        maxSupportedApiVersion: 2
 
     namespace:
       value: "a.b.c"
 
     ref:
       value: "main"
+
+    refWithHash:
+      value: "main@2e1cfa82b035c26cbbbdae632cea070514eb8b773f616aaeaf668e2f0be8f10d"
+
+    refDefault:
+      value: "-"
+
+    refDetached:
+      value: "@2e1cfa82b035c26cbbbdae632cea070514eb8b773f616aaeaf668e2f0be8f10d"
 
     referenceType:
       value: "branch"
@@ -174,6 +354,13 @@ components:
                 - example
                 - key
             type: ICEBERG_TABLE
+        prefixes:
+          - elements:
+              - example
+              - a
+          - elements:
+              - example
+              - b
 
     types:
       value:
@@ -183,7 +370,6 @@ components:
       value:
         fromHash: "abcdef4242424242424242424242beef00dead42112233445566778899001122"
         fromRefName: "source-ref-name"
-        keepIndividualCommits: false
         defaultKeyMergeMode: "NORMAL"
         keyMergeModes:
           - key:
@@ -200,7 +386,6 @@ components:
         hashesToTransplant:
           - "abcdef4242424242424242424242beef00dead42112233445566778899001122"
         fromRefName: "source-ref-name"
-        keepIndividualCommits: false
         defaultKeyMergeMode: "NORMAL"
         keyMergeModes:
           - key:
@@ -514,8 +699,8 @@ components:
         diffs:
           - key:
               elements:
-                 - example
-                 - key
+                - example
+                - key
             from:
               type: ICEBERG_TABLE
               id: "f350b391-f492-41eb-9959-730a8c49f01e"

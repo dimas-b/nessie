@@ -41,12 +41,12 @@ abstract class AbstractTestDatabaseAdapterResteasy extends AbstractResteasyTest 
   @BeforeAll
   static void setup(@NessieClientUri URI uri) {
     RestAssured.baseURI = uri.toString();
+    basePath = ""; // baseURI has the full base path
     RestAssured.port = uri.getPort();
     RestAssured.requestSpecification =
         new RequestSpecBuilder()
             .setContentType(ContentType.JSON)
             .setAccept(ContentType.JSON)
             .build();
-    basePath = "/";
   }
 }

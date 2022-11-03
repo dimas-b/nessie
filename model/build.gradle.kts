@@ -51,7 +51,7 @@ smallryeOpenApi {
   schemaFilename.set("META-INF/openapi/openapi")
   operationIdStrategy.set("METHOD")
   scanPackages.set(
-    listOf("org.projectnessie.api", "org.projectnessie.api.http", "org.projectnessie.model")
+    listOf("org.projectnessie.api.v2", "org.projectnessie.api.v2.http", "org.projectnessie.model")
   )
 }
 

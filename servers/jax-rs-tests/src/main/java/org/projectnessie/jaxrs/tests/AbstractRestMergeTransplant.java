@@ -24,10 +24,16 @@ import static org.assertj.core.data.MapEntry.entry;
 
 import com.google.common.collect.ImmutableList;
 import org.assertj.core.api.InstanceOfAssertFactories;
+import org.assertj.core.configuration.ConfigurationProvider;
+import org.assertj.core.configuration.PreferredAssumptionException;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.EnumSource.Mode;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.projectnessie.client.api.NessieApiV2;
+import org.projectnessie.client.ext.NessieApiVersion;
+import org.projectnessie.client.ext.NessieApiVersions;
 import org.projectnessie.error.BaseNessieClientServerException;
 import org.projectnessie.error.NessieConflictException;
 import org.projectnessie.error.NessieNotFoundException;
@@ -50,6 +56,12 @@ import org.projectnessie.model.Reference;
 /** See {@link AbstractTestRest} for details about and reason for the inheritance model. */
 public abstract class AbstractRestMergeTransplant extends AbstractRestInvalid {
 
+  static {
+    ConfigurationProvider.CONFIGURATION_PROVIDER
+        .configuration()
+        .setPreferredAssumptionException(PreferredAssumptionException.JUNIT5);
+  }
+
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
   public void transplantKeepCommits(boolean withDetachedCommit)
@@ -59,6 +71,7 @@ public abstract class AbstractRestMergeTransplant extends AbstractRestInvalid {
 
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
+  @NessieApiVersions(versions = NessieApiVersion.V1) // API V2 does not allow squashed transplants
   public void transplantSquashed(boolean withDetachedCommit)
       throws BaseNessieClientServerException {
     testTransplant(withDetachedCommit, false);
@@ -66,6 +79,11 @@ public abstract class AbstractRestMergeTransplant extends AbstractRestInvalid {
 
   private void testTransplant(boolean withDetachedCommit, boolean keepIndividualCommits)
       throws BaseNessieClientServerException {
+    // API v2 does not allow squashing transplants
+    if (getApi() instanceof NessieApiV2) {
+      Assumptions.assumeTrue(keepIndividualCommits);
+    }
+
     mergeTransplant(
         false,
         keepIndividualCommits,
@@ -82,6 +100,7 @@ public abstract class AbstractRestMergeTransplant extends AbstractRestInvalid {
 
   @ParameterizedTest
   @EnumSource(names = {"UNCHANGED", "DETACHED"}) // hash is required
+  @NessieApiVersions(versions = NessieApiVersion.V1) // API V2 does not allow unsquashed merges
   public void mergeKeepCommits(ReferenceMode refMode) throws BaseNessieClientServerException {
     testMerge(refMode, true);
   }
@@ -94,6 +113,11 @@ public abstract class AbstractRestMergeTransplant extends AbstractRestInvalid {
 
   private void testMerge(ReferenceMode refMode, boolean keepIndividualCommits)
       throws BaseNessieClientServerException {
+    // API v2 always squashed merges
+    if (getApi() instanceof NessieApiV2) {
+      Assumptions.assumeFalse(keepIndividualCommits);
+    }
+
     mergeTransplant(
         !keepIndividualCommits,
         keepIndividualCommits,
@@ -198,7 +222,6 @@ public abstract class AbstractRestMergeTransplant extends AbstractRestInvalid {
     if (keepIndividualCommits) {
       assertThat(
               log.getLogEntries().stream().map(LogEntry::getCommitMeta).map(CommitMeta::getMessage))
-          .hasSize(3)
           .containsExactly("test-branch2", "test-branch1", "test-main");
     } else {
       assertThat(
@@ -452,19 +475,19 @@ public abstract class AbstractRestMergeTransplant extends AbstractRestInvalid {
         .mergeRefIntoBranch()
         .branch(base)
         .fromRef(refMode.transform(committed2))
-        .keepIndividualCommits(true)
+        .keepIndividualCommits(false)
         .merge();
 
     LogResponse log =
         getApi().getCommitLog().refName(base.getName()).untilHash(base.getHash()).get();
     assertThat(
-            log.getLogEntries().stream().map(LogEntry::getCommitMeta).map(CommitMeta::getMessage))
-        .containsExactly(
-            "test-branch2",
-            "test-branch1",
-            "create namespace a.b.c",
-            "test-main",
-            "create namespace a.b.c");
+            log.getLogEntries().stream()
+                .map(LogEntry::getCommitMeta)
+                .map(CommitMeta::getMessage)
+                .findFirst())
+        .isPresent()
+        .hasValueSatisfying(v -> assertThat(v).contains("test-branch1"))
+        .hasValueSatisfying(v -> assertThat(v).contains("test-branch2"));
 
     assertThat(
             getApi().getEntries().refName(base.getName()).get().getEntries().stream()
