@@ -57,7 +57,7 @@ import org.projectnessie.versioned.VersionStore;
 
 /** REST endpoint for the tree-API. */
 @RequestScoped
-@Path("v2/trees")
+@Path("v2beta/trees")
 public class RestV2TreeResource implements HttpTreeApi {
 
   private final ServerConfig config;

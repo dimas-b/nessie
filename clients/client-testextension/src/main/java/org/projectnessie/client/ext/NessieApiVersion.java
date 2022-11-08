@@ -22,7 +22,7 @@ import org.projectnessie.client.api.NessieApiV2;
 
 public enum NessieApiVersion {
   V1("v1", NessieApiV1.class),
-  V2("v2", NessieApiV2.class),
+  V2("v2beta", NessieApiV2.class),
   ;
 
   private final String uriPathElement;

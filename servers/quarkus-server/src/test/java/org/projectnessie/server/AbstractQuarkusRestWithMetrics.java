@@ -70,15 +70,14 @@ public abstract class AbstractQuarkusRestWithMetrics extends AbstractTestQuarkus
   @NessieApiVersions(versions = NessieApiVersion.V2)
   void smokeHttpApiV2Metrics() {
     String body = getMetrics();
-    assertThat(body).contains("/api/v2/config");
-    assertThat(body).contains("/api/v2/trees/{");
-    assertThat(body).contains("/api/v2/trees/{ref}");
-    assertThat(body).contains("/api/v2/trees/{ref}/contents");
-    assertThat(body).contains("/api/v2/trees/{ref}/entries");
-    assertThat(body).contains("/api/v2/trees/{ref}/history");
-    assertThat(body).contains("/api/v2/trees/{ref}/history/commit");
-    assertThat(body).contains("/api/v2/trees/{ref}/history/merge");
-    assertThat(body).contains("/api/v2/trees/{ref}/history/transplant");
-    assertThat(body).contains("/api/v2/trees/{from-ref}/diff/{to-ref}");
+    assertThat(body).contains("/api/v2beta/config");
+    assertThat(body).contains("/api/v2beta/trees/{ref}");
+    assertThat(body).contains("/api/v2beta/trees/{ref}/contents");
+    assertThat(body).contains("/api/v2beta/trees/{ref}/entries");
+    assertThat(body).contains("/api/v2beta/trees/{ref}/history");
+    assertThat(body).contains("/api/v2beta/trees/{ref}/history/commit");
+    assertThat(body).contains("/api/v2beta/trees/{ref}/history/merge");
+    assertThat(body).contains("/api/v2beta/trees/{ref}/history/transplant");
+    assertThat(body).contains("/api/v2beta/trees/{from-ref}/diff/{to-ref}");
   }
 }

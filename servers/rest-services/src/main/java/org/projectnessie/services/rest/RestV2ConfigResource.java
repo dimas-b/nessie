@@ -22,7 +22,7 @@ import org.projectnessie.services.config.ServerConfig;
 
 /** REST endpoint to retrieve server settings. */
 @RequestScoped
-@Path("v2/config")
+@Path("v2beta/config")
 public class RestV2ConfigResource extends RestConfigResource {
 
   // Mandated by CDI 2.0
