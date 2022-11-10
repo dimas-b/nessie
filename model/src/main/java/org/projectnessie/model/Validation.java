@@ -36,7 +36,7 @@ public final class Validation {
   public static final String REF_NAME_OR_HASH_REGEX =
       "^((" + HASH_RAW_REGEX + ")|(" + REF_NAME_RAW_REGEX + "))$";
   public static final String REF_NAME_PATH_REGEX =
-      "^" + REF_NAME_RAW_REGEX + "(@" + HASH_RAW_REGEX + ")?$";
+      "^" + REF_NAME_RAW_REGEX + "(@(" + HASH_RAW_REGEX + ")?)?$";
   public static final String REF_NAME_PATH_ELEMENT_REGEX = "([^/]+|[^@]+@[^@/]*?)";
 
   public static final Pattern HASH_PATTERN = Pattern.compile(HASH_REGEX);
@@ -53,7 +53,7 @@ public final class Validation {
       "Reference name must "
           + REF_RULE
           + ", optionally followed "
-          + "by ~ and a commit hash, which must "
+          + "by @ and a commit hash, which must "
           + HASH_RULE;
   public static final String REF_NAME_MESSAGE = "Reference name must " + REF_RULE;
   public static final String REF_NAME_OR_HASH_MESSAGE =

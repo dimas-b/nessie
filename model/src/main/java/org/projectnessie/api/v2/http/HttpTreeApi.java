@@ -170,7 +170,7 @@ public interface HttpTreeApi extends TreeApi {
   @Override
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  @Path("{ref:([^/]+|[^~]+~)}/entries")
+  @Path("{ref:" + REF_NAME_PATH_ELEMENT_REGEX + "}/entries")
   @Operation(
       summary = "Fetch all entries for a given reference",
       description =
@@ -276,19 +276,25 @@ public interface HttpTreeApi extends TreeApi {
   @Override
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  @Path("{from-ref:([^/]+|[^~]+~)}/diff/{to-ref:([^/]+|[^~]+~)}")
+  @Path(
+      "{from-ref:"
+          + REF_NAME_PATH_ELEMENT_REGEX
+          + "}/diff/{to-ref:"
+          + REF_NAME_PATH_ELEMENT_REGEX
+          + "}")
   @Operation(
       summary = "Get contents that differ in the trees specified by the two given references",
       description =
           "The URL pattern is basically 'from' and 'to' reference specs separated by '/diff/'\n"
               + "\n"
               + "Examples: \n"
-              + "- ref/main/diff/myBranch\n"
-              + "- ref/main@1234567890123456/diff/myBranch\n"
-              + "- ref/main@1234567890123456/diff/myBranch@23445678\n"
-              + "- ref/main/diff/myBranch@23445678\n"
-              + "- ref/main/diff/myBranch@23445678\n"
-              + "- ref/myBranch/diff/-\n")
+              + "- main/diff/myBranch\n"
+              + "- main@1234567890123456/diff/myBranch\n"
+              + "- main@1234567890123456/diff/myBranch@23445678\n"
+              + "- main/diff/myBranch@23445678\n"
+              + "- main/diff/myBranch@23445678\n"
+              + "- my/branch@/diff/main\n"
+              + "- myBranch/diff/-\n")
   @APIResponses({
     @APIResponse(
         responseCode = "200",

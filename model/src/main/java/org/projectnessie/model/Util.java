@@ -35,6 +35,8 @@ final class Util {
   public static final char ZERO_BYTE = '\u0000';
   public static final char DOT = '.';
   public static final char GROUP_SEPARATOR = '\u001D';
+  public static final char REF_HASH_SEPARATOR = '@';
+  public static final char URL_PATH_SEPARATOR = '/';
   public static final String DOT_STRING = ".";
   public static final String ZERO_BYTE_STRING = Character.toString(ZERO_BYTE);
   public static final String GROUP_SEPARATOR_STRING = Character.toString(GROUP_SEPARATOR);
@@ -64,14 +66,20 @@ final class Util {
 
   public static String toPathStringRef(String name, String hash) {
     StringBuilder builder = new StringBuilder();
+    boolean separatorRequired = hash != null;
     if (name != null) {
       builder.append(name);
+      separatorRequired |= name.indexOf(URL_PATH_SEPARATOR) >= 0;
+    }
+
+    if (separatorRequired) {
+      builder.append(REF_HASH_SEPARATOR);
     }
 
     if (hash != null) {
-      builder.append("@");
       builder.append(hash);
     }
+
     return builder.toString();
   }
 
@@ -79,7 +87,7 @@ final class Util {
       @Nonnull String value, @Nonnull Reference.ReferenceType namedRefType) {
     String name = null;
     String hash = null;
-    int hashIdx = value.indexOf("@");
+    int hashIdx = value.indexOf(REF_HASH_SEPARATOR);
 
     if (hashIdx > 0) {
       name = value.substring(0, hashIdx);
@@ -91,6 +99,9 @@ final class Util {
 
     if (hashIdx >= 0) {
       hash = value.substring(hashIdx + 1);
+      if (hash.isEmpty()) {
+        hash = null;
+      }
     }
 
     if (name == null) {
