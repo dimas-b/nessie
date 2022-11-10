@@ -201,7 +201,7 @@ public interface TreeApi {
       @Valid Transplant transplant)
       throws NessieNotFoundException, NessieConflictException;
 
-  /** merge mergeRef onto ref. */
+  /** Merge commits from any reference onto a branch. */
   MergeResponse mergeRefIntoBranch(
       @Valid
           @NotNull

@@ -15,11 +15,14 @@
  */
 package org.projectnessie.api.v2.params;
 
+import static org.projectnessie.api.v2.doc.ApiDoc.REF_PARAMETER_DESCRIPTION;
+
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
+import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.immutables.builder.Builder.Constructor;
 import org.projectnessie.api.params.FetchOption;
@@ -27,7 +30,14 @@ import org.projectnessie.model.Validation;
 
 public class GetReferenceParams {
 
-  @Parameter(ref = "refPathParameter")
+  @Parameter(
+      description = REF_PARAMETER_DESCRIPTION,
+      examples = {
+        @ExampleObject(ref = "ref"),
+        @ExampleObject(ref = "refWithHash"),
+        @ExampleObject(ref = "refDefault"),
+        @ExampleObject(ref = "refDetached"),
+      })
   @PathParam("ref")
   @NotNull
   @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)

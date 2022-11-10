@@ -15,24 +15,43 @@
  */
 package org.projectnessie.api.v2.params;
 
+import static org.projectnessie.api.v2.doc.ApiDoc.REF_PARAMETER_DESCRIPTION;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.ws.rs.PathParam;
+import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.immutables.builder.Builder.Constructor;
 import org.projectnessie.model.Validation;
 
+/**
+ * Parameters for the {@code getDiff} API method.
+ *
+ * <p>{@code startKey} plus {@code endKey} selectors and pagination will be added soon. The
+ * intention is to allow clients to request a diff on a sub-set of keys (e.g. in one particular
+ * namespace) or just for one particular key.
+ */
 public class DiffParams {
 
   @NotNull
   @Pattern(regexp = Validation.REF_NAME_PATH_REGEX, message = Validation.REF_NAME_PATH_MESSAGE)
-  @Parameter(ref = "refPathFromParameter")
+  @Parameter(
+      description = REF_PARAMETER_DESCRIPTION,
+      examples = {
+        @ExampleObject(ref = "ref"),
+        @ExampleObject(ref = "refWithHash"),
+        @ExampleObject(ref = "refDefault"),
+        @ExampleObject(ref = "refDetached"),
+      })
   @PathParam("from-ref")
   private String fromRef;
 
   @NotNull
   @Pattern(regexp = Validation.REF_NAME_PATH_REGEX, message = Validation.REF_NAME_PATH_MESSAGE)
-  @Parameter(ref = "refPathToParameter")
+  @Parameter(
+      description =
+          "Same reference spec as in the 'from-ref' parameter but identifying the other tree for comparison.")
   @PathParam("to-ref")
   private String toRef;
 

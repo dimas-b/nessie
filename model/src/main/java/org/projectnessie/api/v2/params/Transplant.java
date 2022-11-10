@@ -15,6 +15,12 @@
  */
 package org.projectnessie.api.v2.params;
 
+import static org.projectnessie.api.v2.doc.ApiDoc.DEFAULT_KEY_MERGE_MODE_DESCRIPTION;
+import static org.projectnessie.api.v2.doc.ApiDoc.DRY_RUN_DESCRIPTION;
+import static org.projectnessie.api.v2.doc.ApiDoc.FETCH_ADDITION_INFO_DESCRIPTION;
+import static org.projectnessie.api.v2.doc.ApiDoc.FROM_REF_NAME_DESCRIPTION;
+import static org.projectnessie.api.v2.doc.ApiDoc.KEY_MERGE_MODES_DESCRIPTION;
+import static org.projectnessie.api.v2.doc.ApiDoc.RETURN_CONFLICTS_AS_RESULT_DESCRIPTION;
 import static org.projectnessie.model.Validation.validateHash;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -41,12 +47,16 @@ import org.immutables.value.Value;
           uniqueItems = true,
           description =
               "Lists the hashes of commits that should be transplanted into the target branch."),
-      @SchemaProperty(name = "fromRefName", ref = "fromRefName"),
-      @SchemaProperty(name = "keyMergeModes", ref = "keyMergeModes"),
-      @SchemaProperty(name = "defaultKeyMergeMode", ref = "defaultKeyMergeMode"),
-      @SchemaProperty(name = "dryRun", ref = "dryRun"),
-      @SchemaProperty(name = "fetchAdditionalInfo", ref = "fetchAdditionalInfo"),
-      @SchemaProperty(name = "returnConflictAsResult", ref = "returnConflictAsResult"),
+      @SchemaProperty(name = "fromRefName", description = FROM_REF_NAME_DESCRIPTION),
+      @SchemaProperty(name = "keyMergeModes", description = KEY_MERGE_MODES_DESCRIPTION),
+      @SchemaProperty(
+          name = "defaultKeyMergeMode",
+          description = DEFAULT_KEY_MERGE_MODE_DESCRIPTION),
+      @SchemaProperty(name = "dryRun", description = DRY_RUN_DESCRIPTION),
+      @SchemaProperty(name = "fetchAdditionalInfo", description = FETCH_ADDITION_INFO_DESCRIPTION),
+      @SchemaProperty(
+          name = "returnConflictAsResult",
+          description = RETURN_CONFLICTS_AS_RESULT_DESCRIPTION),
     })
 @Value.Immutable
 @JsonSerialize(as = ImmutableTransplant.class)

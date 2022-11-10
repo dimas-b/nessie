@@ -15,6 +15,14 @@
  */
 package org.projectnessie.api.v2.http;
 
+import static org.projectnessie.api.v2.doc.ApiDoc.BRANCH_DESCRIPTION;
+import static org.projectnessie.api.v2.doc.ApiDoc.CHECKED_REF_DESCRIPTION;
+import static org.projectnessie.api.v2.doc.ApiDoc.CHECKED_REF_INFO;
+import static org.projectnessie.api.v2.doc.ApiDoc.KEY_PARAMETER_DESCRIPTION;
+import static org.projectnessie.api.v2.doc.ApiDoc.PAGING_INFO;
+import static org.projectnessie.api.v2.doc.ApiDoc.REF_PARAMETER_DESCRIPTION;
+import static org.projectnessie.model.Validation.REF_NAME_PATH_ELEMENT_REGEX;
+
 import java.util.List;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
@@ -65,8 +73,6 @@ import org.projectnessie.model.SingleReferenceResponse;
 @Path("trees")
 @Tag(name = "v2")
 public interface HttpTreeApi extends TreeApi {
-
-  String REF_NAME_PATH_ELEMENT_REGEX = "([^/]+|[^@]+@[^@/]*?)";
 
   @Override
   @GET
@@ -176,23 +182,10 @@ public interface HttpTreeApi extends TreeApi {
               + "Backends may also cap the returned entries at a hard-coded limit, the default "
               + "REST server implementation has such a hard-coded limit.\n"
               + "\n"
-              + "To implement paging, check 'hasMore' in the response and, if 'true', pass the value "
-              + "returned as 'token' in the next invocation as the 'pageToken' parameter.\n"
-              + "\n"
-              + "The content and meaning of the returned 'token' is \"private\" to the implementation,"
-              + "treat is as an opaque value.\n"
-              + "\n"
-              + "It is wrong to assume that invoking this method with a very high 'maxRecords' value "
-              + "will return all commit log entries.\n"
+              + PAGING_INFO
               + "\n"
               + "The 'filter' parameter allows for advanced filtering capabilities using the Common Expression Language (CEL).\n"
-              + "An intro to CEL can be found at https://github.com/google/cel-spec/blob/master/doc/intro.md.\n"
-              + "\n"
-              + "The 'namespace' and 'derive-prefixes' parameters may be used to determine the first level of child "
-              + "namespaces relative to the 'namespace' parameters while fetching ordinary entries in the specified "
-              + "'namespace'. Note that when these parameters are set the returned prefixes are computed in the "
-              + "context the subset of entries used to fill the current results page. Subsequent pages may uncover "
-              + "new prefixes and they may contain previously reported prefixes too.")
+              + "An intro to CEL can be found at https://github.com/google/cel-spec/blob/master/doc/intro.md.\n")
   @APIResponses({
     @APIResponse(
         description = "List names and object types in a contents tree",
@@ -211,7 +204,17 @@ public interface HttpTreeApi extends TreeApi {
     @APIResponse(responseCode = "404", description = "Ref not found")
   })
   EntriesResponse getEntries(
-      @Parameter(ref = "refPathParameter") @PathParam("ref") String ref,
+      @Parameter(
+              schema = @Schema(pattern = REF_NAME_PATH_ELEMENT_REGEX),
+              description = REF_PARAMETER_DESCRIPTION,
+              examples = {
+                @ExampleObject(ref = "ref"),
+                @ExampleObject(ref = "refWithHash"),
+                @ExampleObject(ref = "refDefault"),
+                @ExampleObject(ref = "refDetached"),
+              })
+          @PathParam("ref")
+          String ref,
       @BeanParam EntriesParams params)
       throws NessieNotFoundException;
 
@@ -227,24 +230,14 @@ public interface HttpTreeApi extends TreeApi {
               + "The backend may respect the given 'max-entries' records hint, or may return more or less entries. "
               + "Backends may also cap the returned entries at a hard-coded limit\n"
               + "\n"
-              + "To implement paging, check the 'hasMore' property in the response and, if 'true', pass the value "
-              + "of its 'token' property in the next invocation as the 'page-token' parameter.\n"
-              + "\n"
-              + "The content and meaning of the returned 'token' is \"internal\" to the implementation,"
-              + "treat is as an opaque value.\n"
-              + "\n"
-              + "Different pages may have different numbers of log records in them even if they come from another "
-              + "log API call with the same parameters.\n"
-              + "\n"
-              + "It is wrong to assume that invoking this method with a very high 'max-records' value "
-              + "will return all commit log entries.\n"
+              + PAGING_INFO
               + "\n"
               + "The 'filter' parameter allows for advanced filtering capabilities using the Common Expression Language (CEL).\n"
               + "An intro to CEL can be found at https://github.com/google/cel-spec/blob/master/doc/intro.md.\n"
               + "\n"
               + "The fetching of the log starts from the HEAD of the given ref (or a more specific commit, if provided "
-              + "as part of the ref spec) and proceeds until the 'root' commit or the 'limit-hash' commit are "
-              + "encountered.")
+              + "as part of the 'ref' path element) and proceeds until the 'root' commit or the 'limit-hash' commit "
+              + "are encountered.")
   @APIResponses({
     @APIResponse(
         responseCode = "200",
@@ -266,7 +259,17 @@ public interface HttpTreeApi extends TreeApi {
     @APIResponse(responseCode = "404", description = "Ref doesn't exists")
   })
   LogResponse getCommitLog(
-      @Parameter(ref = "refPathParameter") @PathParam("ref") String ref,
+      @Parameter(
+              schema = @Schema(pattern = REF_NAME_PATH_ELEMENT_REGEX),
+              description = REF_PARAMETER_DESCRIPTION,
+              examples = {
+                @ExampleObject(ref = "ref"),
+                @ExampleObject(ref = "refWithHash"),
+                @ExampleObject(ref = "refDefault"),
+                @ExampleObject(ref = "refDetached"),
+              })
+          @PathParam("ref")
+          String ref,
       @BeanParam CommitLogParams params)
       throws NessieNotFoundException;
 
@@ -311,10 +314,8 @@ public interface HttpTreeApi extends TreeApi {
   @Operation(
       summary = "Set a named reference to a specific hash via another reference.",
       description =
-          "The 'ref' parameter identifies the branch or tag to be reassigned. The 'ref' spec may contain a hash "
-              + "qualifier. That hash as well as the optional 'type' parameter may be used to ensure the operation is "
-              + "performed on the same object that the user expects. If the 'hash' is present it will be validated to be "
-              + "equal to the current HEAD of the reference.\n"
+          "The 'ref' parameter identifies the branch or tag to be reassigned.\n"
+              + CHECKED_REF_INFO
               + "\n"
               + "Only branches and tags may be reassigned."
               + "\n"
@@ -336,8 +337,18 @@ public interface HttpTreeApi extends TreeApi {
               examples = {@ExampleObject(ref = "referenceType")})
           @QueryParam("type")
           Reference.ReferenceType type,
-      @Parameter(ref = "checkedRefParameter") @PathParam("ref") String ref,
+      @Parameter(
+              schema = @Schema(pattern = REF_NAME_PATH_ELEMENT_REGEX),
+              description = CHECKED_REF_DESCRIPTION,
+              examples = {
+                @ExampleObject(ref = "ref"),
+                @ExampleObject(ref = "refWithHash"),
+                @ExampleObject(ref = "refDefault"),
+              })
+          @PathParam("ref")
+          String ref,
       @RequestBody(
+              required = true,
               description =
                   "Reference to which the 'ref' (from the path parameter) shall be assigned. This must be either a "
                       + "'Detached' commit, 'Branch' or 'Tag' via which the hash is visible to the caller.",
@@ -355,10 +366,8 @@ public interface HttpTreeApi extends TreeApi {
   @Operation(
       summary = "Delete a reference",
       description =
-          "The 'ref' parameter identifies the branch or tag to be deleted. The 'ref' spec may contain a hash "
-              + "qualifier. That hash as well as the optional 'type' parameter may be used to ensure the operation is "
-              + "performed on the same object that the user expects. If the 'hash' is present it will be validated to be "
-              + "equal to the current HEAD of the reference.\n"
+          "The 'ref' parameter identifies the branch or tag to be deleted.\n"
+              + CHECKED_REF_INFO
               + "\n"
               + "Only branches and tags can be deleted. However, deleting the default branch may be restricted.")
   @APIResponses({
@@ -375,7 +384,16 @@ public interface HttpTreeApi extends TreeApi {
               examples = {@ExampleObject(ref = "referenceType")})
           @QueryParam("type")
           Reference.ReferenceType type,
-      @Parameter(ref = "checkedRefParameter") @PathParam("ref") String ref)
+      @Parameter(
+              schema = @Schema(pattern = REF_NAME_PATH_ELEMENT_REGEX),
+              description = CHECKED_REF_DESCRIPTION,
+              examples = {
+                @ExampleObject(ref = "ref"),
+                @ExampleObject(ref = "refWithHash"),
+                @ExampleObject(ref = "refDefault"),
+              })
+          @PathParam("ref")
+          String ref)
       throws NessieConflictException, NessieNotFoundException;
 
   @Override
@@ -406,8 +424,18 @@ public interface HttpTreeApi extends TreeApi {
         description = "Table not found on 'ref' or non-existent reference")
   })
   ContentResponse getContent(
-      @Parameter(ref = "keyPathParameter") @PathParam("key") ContentKey key,
-      @Parameter(ref = "refPathParameter") @PathParam("ref") String ref)
+      @Parameter(description = KEY_PARAMETER_DESCRIPTION) @PathParam("key") ContentKey key,
+      @Parameter(
+              schema = @Schema(pattern = REF_NAME_PATH_ELEMENT_REGEX),
+              description = REF_PARAMETER_DESCRIPTION,
+              examples = {
+                @ExampleObject(ref = "ref"),
+                @ExampleObject(ref = "refWithHash"),
+                @ExampleObject(ref = "refDefault"),
+                @ExampleObject(ref = "refDetached"),
+              })
+          @PathParam("ref")
+          String ref)
       throws NessieNotFoundException;
 
   @GET
@@ -444,7 +472,7 @@ public interface HttpTreeApi extends TreeApi {
               examples = {@ExampleObject(ref = "ref")})
           @PathParam("ref")
           String ref,
-      @Parameter(ref = "keyQueryParameter") @QueryParam("key") List<String> keys)
+      @Parameter(description = KEY_PARAMETER_DESCRIPTION) @QueryParam("key") List<String> keys)
       throws NessieNotFoundException {
     ImmutableGetMultipleContentsRequest.Builder request = GetMultipleContentsRequest.builder();
     keys.forEach(k -> request.addRequestedKeys(ContentKey.fromPathString(k)));
@@ -462,9 +490,9 @@ public interface HttpTreeApi extends TreeApi {
           "Similar to 'GET /trees/{ref}/content/{key}', but takes multiple 'ContentKey's (in the JSON payload) and "
               + "returns zero or more content objects.\n"
               + "\n"
-              + "Note that if some of the keys from the request do not have an associated content object at the "
-              + "point in history defined by the 'ref' parameter, the response will be successful, but no data will "
-              + "be returned for the missing keys.")
+              + "Note that if some keys from the request do not have an associated content object at the point in "
+              + "history defined by the 'ref' parameter, the response will be successful, but no data will be "
+              + "returned for the missing keys.")
   @APIResponses({
     @APIResponse(
         responseCode = "200",
@@ -482,7 +510,17 @@ public interface HttpTreeApi extends TreeApi {
     @APIResponse(responseCode = "404", description = "Provided ref doesn't exists")
   })
   GetMultipleContentsResponse getMultipleContents(
-      @Parameter(ref = "refPathParameter") @PathParam("ref") String ref,
+      @Parameter(
+              schema = @Schema(pattern = REF_NAME_PATH_ELEMENT_REGEX),
+              description = REF_PARAMETER_DESCRIPTION,
+              examples = {
+                @ExampleObject(ref = "ref"),
+                @ExampleObject(ref = "refWithHash"),
+                @ExampleObject(ref = "refDefault"),
+                @ExampleObject(ref = "refDetached"),
+              })
+          @PathParam("ref")
+          String ref,
       @RequestBody(
               description = "Keys to retrieve.",
               content = @Content(examples = @ExampleObject(ref = "multiGetRequest")))
@@ -528,7 +566,16 @@ public interface HttpTreeApi extends TreeApi {
     @APIResponse(responseCode = "409", description = "update conflict")
   })
   MergeResponse transplantCommitsIntoBranch(
-      @Parameter(ref = "branchPathParameter") @PathParam("branch") String branch,
+      @Parameter(
+              schema = @Schema(pattern = REF_NAME_PATH_ELEMENT_REGEX),
+              description = BRANCH_DESCRIPTION,
+              examples = {
+                @ExampleObject(ref = "ref"),
+                @ExampleObject(ref = "refWithHash"),
+                @ExampleObject(ref = "refDefault"),
+              })
+          @PathParam("branch")
+          String branch,
       @RequestBody(
               required = true,
               description = "Commits to transplant",
@@ -580,7 +627,16 @@ public interface HttpTreeApi extends TreeApi {
     @APIResponse(responseCode = "409", description = "update conflict")
   })
   MergeResponse mergeRefIntoBranch(
-      @Parameter(ref = "branchPathParameter") @PathParam("branch") String branch,
+      @Parameter(
+              schema = @Schema(pattern = REF_NAME_PATH_ELEMENT_REGEX),
+              description = BRANCH_DESCRIPTION,
+              examples = {
+                @ExampleObject(ref = "ref"),
+                @ExampleObject(ref = "refWithHash"),
+                @ExampleObject(ref = "refDefault"),
+              })
+          @PathParam("branch")
+          String branch,
       @RequestBody(
               required = true,
               description =
@@ -625,8 +681,18 @@ public interface HttpTreeApi extends TreeApi {
     @APIResponse(responseCode = "409", description = "Update conflict")
   })
   CommitResponse commitMultipleOperations(
-      @Parameter(ref = "branchPathParameter") @PathParam("branch") String branch,
+      @Parameter(
+              schema = @Schema(pattern = REF_NAME_PATH_ELEMENT_REGEX),
+              description = BRANCH_DESCRIPTION,
+              examples = {
+                @ExampleObject(ref = "ref"),
+                @ExampleObject(ref = "refWithHash"),
+                @ExampleObject(ref = "refDefault"),
+              })
+          @PathParam("branch")
+          String branch,
       @RequestBody(
+              required = true,
               description = "Operations to commit",
               content =
                   @Content(
