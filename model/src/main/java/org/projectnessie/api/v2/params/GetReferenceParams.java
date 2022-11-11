@@ -15,7 +15,7 @@
  */
 package org.projectnessie.api.v2.params;
 
-import static org.projectnessie.api.v2.doc.ApiDoc.REF_PARAMETER_DESCRIPTION;
+import static org.projectnessie.api.v2.doc.ApiDoc.REF_NAME_DESCRIPTION;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
@@ -31,13 +31,8 @@ import org.projectnessie.model.Validation;
 public class GetReferenceParams {
 
   @Parameter(
-      description = REF_PARAMETER_DESCRIPTION,
-      examples = {
-        @ExampleObject(ref = "ref"),
-        @ExampleObject(ref = "refWithHash"),
-        @ExampleObject(ref = "refDefault"),
-        @ExampleObject(ref = "refDetached"),
-      })
+      description = REF_NAME_DESCRIPTION,
+      examples = {@ExampleObject(ref = "ref")})
   @PathParam("ref")
   @NotNull
   @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)
