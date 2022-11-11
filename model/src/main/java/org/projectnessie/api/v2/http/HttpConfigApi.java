@@ -30,7 +30,6 @@ import org.projectnessie.api.v2.ConfigApi;
 import org.projectnessie.model.NessieConfiguration;
 
 @Path("config")
-@Tag(name = "v1")
 @Tag(name = "v2")
 public interface HttpConfigApi extends ConfigApi {
 

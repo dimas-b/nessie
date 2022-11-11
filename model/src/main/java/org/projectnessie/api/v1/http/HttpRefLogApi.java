@@ -26,11 +26,13 @@ import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.projectnessie.api.v1.RefLogApi;
 import org.projectnessie.api.v1.params.RefLogParams;
 import org.projectnessie.error.NessieNotFoundException;
 import org.projectnessie.model.RefLogResponse;
 
+@Tag(name = "v1")
 @Consumes(value = MediaType.APPLICATION_JSON)
 @Path("reflogs")
 public interface HttpRefLogApi extends RefLogApi {
