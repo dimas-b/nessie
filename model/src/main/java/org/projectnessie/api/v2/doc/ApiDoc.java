@@ -15,6 +15,8 @@
  */
 package org.projectnessie.api.v2.doc;
 
+import static org.projectnessie.model.Validation.REF_NAME_MESSAGE;
+
 /** A collections of constants for defining OpenAPI annotations. */
 public interface ApiDoc {
 
@@ -55,6 +57,8 @@ public interface ApiDoc {
           + "generally discouraged.\n"
           + "\n"
           + FULL_REF_INFO;
+
+  String REF_NAME_DESCRIPTION = "A reference name.\n\n" + REF_NAME_MESSAGE + "\n";
 
   String REF_PARAMETER_DESCRIPTION =
       "A reference to a particular version of the contents tree (a point in history).\n"

@@ -84,9 +84,7 @@ public interface TreeApi {
   SingleReferenceResponse createReference(
       @Valid
           @NotNull
-          @Pattern(
-              regexp = Validation.REF_NAME_PATH_REGEX,
-              message = Validation.REF_NAME_PATH_MESSAGE)
+          @Pattern(regexp = Validation.REF_NAME_REGEX, message = Validation.REF_NAME_MESSAGE)
           String name,
       @Valid @NotNull Reference.ReferenceType type,
       @Valid @Nullable Reference sourceRef)

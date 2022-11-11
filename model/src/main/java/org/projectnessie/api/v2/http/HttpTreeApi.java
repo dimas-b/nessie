@@ -20,6 +20,7 @@ import static org.projectnessie.api.v2.doc.ApiDoc.CHECKED_REF_DESCRIPTION;
 import static org.projectnessie.api.v2.doc.ApiDoc.CHECKED_REF_INFO;
 import static org.projectnessie.api.v2.doc.ApiDoc.KEY_PARAMETER_DESCRIPTION;
 import static org.projectnessie.api.v2.doc.ApiDoc.PAGING_INFO;
+import static org.projectnessie.api.v2.doc.ApiDoc.REF_NAME_DESCRIPTION;
 import static org.projectnessie.api.v2.doc.ApiDoc.REF_PARAMETER_DESCRIPTION;
 import static org.projectnessie.model.Validation.REF_NAME_PATH_ELEMENT_REGEX;
 
@@ -125,7 +126,7 @@ public interface HttpTreeApi extends TreeApi {
         description = "Another reference with the same name already exists"),
   })
   SingleReferenceResponse createReference(
-      @Parameter(required = true, description = "New reference name") @QueryParam("name")
+      @Parameter(required = true, description = REF_NAME_DESCRIPTION) @QueryParam("name")
           String name,
       @Parameter(
               required = true,
