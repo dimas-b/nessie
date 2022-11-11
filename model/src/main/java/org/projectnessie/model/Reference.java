@@ -89,6 +89,10 @@ public interface Reference extends Base {
   @Value.Redacted
   ReferenceType getType();
 
+  default String toPathString() {
+    return toPathString(getName(), getHash());
+  }
+
   static String toPathString(String name, String hash) {
     return Util.toPathStringRef(name, hash);
   }

@@ -15,11 +15,11 @@
  */
 package org.projectnessie.jaxrs.tests;
 
-import org.projectnessie.versioned.persist.mongodb.LocalMongoTestConnectionProviderSource;
-import org.projectnessie.versioned.persist.mongodb.MongoDatabaseAdapterFactory;
 import org.projectnessie.versioned.persist.tests.extension.NessieDbAdapterName;
 import org.projectnessie.versioned.persist.tests.extension.NessieExternalDatabase;
+import org.projectnessie.versioned.persist.tx.h2.H2DatabaseAdapterFactory;
+import org.projectnessie.versioned.persist.tx.h2.H2TestConnectionProviderSource;
 
-@NessieDbAdapterName(MongoDatabaseAdapterFactory.NAME)
-@NessieExternalDatabase(LocalMongoTestConnectionProviderSource.class)
-class ITJerseyResteasyMongo extends AbstractTestDatabaseAdapterResteasy {}
+@NessieDbAdapterName(H2DatabaseAdapterFactory.NAME)
+@NessieExternalDatabase(H2TestConnectionProviderSource.class)
+class TestJerseyResteasyV1H2 extends AbstractTestDatabaseAdapterResteasyV1 {}
