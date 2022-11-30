@@ -50,7 +50,7 @@
     "eslint-webpack-plugin": "^2.5.2",
     "file-loader": "6.2.0",
     "formik": "^2.2.9",
-    "fs-extra": "^10.0.0",
+    "fs-extra": "^11.1.0",
     "history": "^5.0.1",
     "html-webpack-plugin": "4.5.2",
     "http-proxy-middleware": "^2.0.1",
