@@ -38,6 +38,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
+import org.projectnessie.model.CommitMeta;
 import org.projectnessie.model.Content;
 import org.projectnessie.nessie.relocated.protobuf.ByteString;
 import org.projectnessie.versioned.storage.common.exceptions.ObjNotFoundException;
@@ -55,6 +57,8 @@ import org.projectnessie.versioned.storage.common.persist.Obj;
 import org.projectnessie.versioned.storage.common.persist.ObjId;
 import org.projectnessie.versioned.storage.common.persist.Persist;
 import org.projectnessie.versioned.storage.common.persist.Reference;
+import org.projectnessie.versioned.storage.versionstore.RefMapping;
+import org.projectnessie.versioned.storage.versionstore.TypeMapping;
 import org.projectnessie.versioned.transfer.files.ExportFileSupplier;
 import org.projectnessie.versioned.transfer.serialize.TransferTypes.Commit;
 import org.projectnessie.versioned.transfer.serialize.TransferTypes.ExportVersion;
@@ -71,7 +75,7 @@ final class ExportPersist extends ExportCommon {
 
   @Override
   ExportVersion getExportVersion() {
-    return ExportVersion.V2;
+    return ExportVersion.V1;
   }
 
   @Override
@@ -145,8 +149,9 @@ final class ExportPersist extends ExportCommon {
         refs.hasNext(); ) {
       Reference reference = refs.next();
       ObjId extendedInfoObj = reference.extendedInfoObj();
+      String name = RefMapping.referenceToNamedRef(reference.name()).getName();
       Ref.Builder refBuilder =
-          Ref.newBuilder().setName(reference.name()).setPointer(reference.pointer().asBytes());
+          Ref.newBuilder().setName(name).setPointer(reference.pointer().asBytes());
       if (extendedInfoObj != null) {
         refBuilder.setExtendedInfoObj(extendedInfoObj.asBytes());
       }
@@ -212,11 +217,20 @@ final class ExportPersist extends ExportCommon {
   }
 
   private Commit mapCommitObj(CommitObj c, IndexesLogic indexesLogic, Map<ObjId, Obj> objs) {
+    CommitMeta commitMeta = TypeMapping.toCommitMeta(c);
+    byte[] commitMetaBytes;
+    try {
+      commitMetaBytes = exporter.objectMapper().writeValueAsBytes(commitMeta);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
+
     Commit.Builder b =
         Commit.newBuilder()
             .setCommitId(c.id().asBytes())
             .setParentCommitId(c.tail().get(0).asBytes())
             .setMessage(c.message())
+            .setMetadata(ByteString.copyFrom(commitMetaBytes))
             .setCommitSequence(c.seq())
             .setCreatedTimeMicros(c.created());
     c.headers()
@@ -230,7 +244,7 @@ final class ExportPersist extends ExportCommon {
               CommitOp content = op.content();
               Operation.Builder opBuilder = b.addOperationsBuilder().setPayload(content.payload());
 
-              opBuilder.addContentKey(op.key().rawString());
+              opBuilder.addAllContentKey(TypeMapping.storeKeyToKey(op.key()).getElements());
 
               ObjId valueId = content.value();
               if (valueId != null) {
