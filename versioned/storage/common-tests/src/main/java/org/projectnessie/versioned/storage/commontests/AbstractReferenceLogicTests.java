@@ -210,7 +210,7 @@ public abstract class AbstractReferenceLogicTests {
   }
 
   @SuppressWarnings("BusyWait")
-  @RepeatedTest(2)
+  @RepeatedTest(20)
   public void refCreationDeletionWithConcurrentRefsListing() throws Exception {
     assumeThat(surroundingTestClass.getSimpleName())
         .isNotIn(

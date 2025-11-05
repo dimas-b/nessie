@@ -42,6 +42,10 @@ import static org.projectnessie.versioned.storage.jdbc2.SqlConstants.REFS_EXTEND
 import static org.projectnessie.versioned.storage.jdbc2.SqlConstants.SCAN_OBJS;
 import static org.projectnessie.versioned.storage.jdbc2.SqlConstants.SCAN_OBJS_ALL;
 import static org.projectnessie.versioned.storage.jdbc2.SqlConstants.STORE_OBJ;
+import static org.projectnessie.versioned.storage.jdbc2.SqlConstants.TABLE_OBJS;
+import static org.projectnessie.versioned.storage.jdbc2.SqlConstants.TABLE_OBJS_PK;
+import static org.projectnessie.versioned.storage.jdbc2.SqlConstants.TABLE_REFS;
+import static org.projectnessie.versioned.storage.jdbc2.SqlConstants.TABLE_REFS_PK;
 import static org.projectnessie.versioned.storage.jdbc2.SqlConstants.UPDATE_OBJS_REFERENCED;
 import static org.projectnessie.versioned.storage.jdbc2.SqlConstants.UPDATE_REFERENCE_POINTER;
 import static org.projectnessie.versioned.storage.serialize.ProtoSerialization.serializeObj;
@@ -156,7 +160,7 @@ abstract class AbstractJdbc2Persist implements Persist {
       throws RefAlreadyExistsException {
     checkArgument(!reference.deleted(), "Deleted references must not be added");
 
-    String sql = databaseSpecific.wrapInsert(ADD_REFERENCE);
+    String sql = databaseSpecific.wrapInsert(ADD_REFERENCE, TABLE_REFS, TABLE_REFS_PK);
     try (PreparedStatement ps = conn.prepareStatement(sql)) {
       ps.setString(1, config.repositoryId());
       ps.setString(2, reference.name());
@@ -492,7 +496,7 @@ abstract class AbstractJdbc2Persist implements Persist {
       List<ObjId> updateReferenced)
       throws ObjTooLargeException {
 
-    try (PreparedStatement ps = conn.prepareStatement(databaseSpecific.wrapInsert(STORE_OBJ))) {
+    try (PreparedStatement ps = conn.prepareStatement(databaseSpecific.wrapInsert(STORE_OBJ, TABLE_OBJS, TABLE_OBJS_PK))) {
       Int2IntHashMap batchIndexToObjIndex =
           new Int2IntHashMap(objs.length * 2, Hashing.DEFAULT_LOAD_FACTOR, -1);
 

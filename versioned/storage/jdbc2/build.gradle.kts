@@ -48,6 +48,7 @@ dependencies {
   testRuntimeOnly(libs.h2)
   intTestRuntimeOnly(libs.postgresql)
   intTestRuntimeOnly(libs.mariadb.java.client)
+  intTestRuntimeOnly("com.oracle.database.jdbc:ojdbc17:23.26.0.0.0")
   intTestRuntimeOnly(platform(libs.testcontainers.bom))
   intTestRuntimeOnly(libs.docker.java.api)
   testFixturesImplementation(platform(libs.junit.bom))

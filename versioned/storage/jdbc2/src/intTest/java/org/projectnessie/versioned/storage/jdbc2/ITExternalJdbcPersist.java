@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Dremio
+ * Copyright (C) 2025 Dremio
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,9 @@
  */
 package org.projectnessie.versioned.storage.jdbc2;
 
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
+import org.projectnessie.versioned.storage.commontests.AbstractPersistTests;
+import org.projectnessie.versioned.storage.jdbc2tests.ExternalBackendTestFactory;
+import org.projectnessie.versioned.storage.testextension.NessieBackend;
 
-public interface DatabaseSpecific {
-
-  Map<Jdbc2ColumnType, String> columnTypes();
-
-  Map<Jdbc2ColumnType, Integer> columnTypeIds();
-
-  boolean isConstraintViolation(SQLException e);
-
-  boolean isRetryTransaction(SQLException e);
-
-  boolean isAlreadyExists(SQLException e);
-
-  String wrapInsert(String sql, String tableName, List<String> keyColumns);
-
-  String primaryKeyCol(String col, Jdbc2ColumnType columnType);
-}
+@NessieBackend(ExternalBackendTestFactory.class)
+public class ITExternalJdbcPersist extends AbstractPersistTests {}

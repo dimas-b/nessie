@@ -15,6 +15,8 @@
  */
 package org.projectnessie.versioned.storage.jdbc2;
 
+import java.util.List;
+
 final class SqlConstants {
 
   static final int MAX_BATCH_SIZE = 50;
@@ -28,6 +30,8 @@ final class SqlConstants {
   static final String COL_OBJ_VERS = "obj_vers";
   static final String COL_OBJ_VALUE = "obj_value";
   static final String COL_OBJ_REFERENCED = "obj_ref";
+
+  static final List<String> TABLE_OBJS_PK = List.of(COL_REPO_ID, COL_OBJ_ID);
 
   static final String ERASE_OBJS =
       "DELETE FROM " + TABLE_OBJS + " WHERE " + COL_REPO_ID + " IN (?)";
@@ -88,6 +92,9 @@ final class SqlConstants {
   static final String COL_REFS_PREVIOUS = "prev_ptr";
   static final String REFS_CREATED_AT_COND = "_REFS_CREATED_AT_";
   static final String REFS_EXTENDED_INFO_COND = "_REFS_EXTENDED_INFO_";
+
+  static final List<String> TABLE_REFS_PK = List.of(COL_REPO_ID, COL_REFS_NAME);
+
   static final String UPDATE_REFERENCE_POINTER =
       "UPDATE "
           + TABLE_REFS

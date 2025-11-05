@@ -21,8 +21,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import javax.sql.DataSource;
 
 public final class DatabaseSpecifics {
@@ -54,6 +57,8 @@ public final class DatabaseSpecifics {
 
   public static final DatabaseSpecific MARIADB_DATABASE_SPECIFIC = new MariaDBDatabaseSpecific();
 
+  public static final DatabaseSpecific ORACLE_DATABASE_SPECIFIC = new OracleDatabaseSpecific();
+
   public static DatabaseSpecific detect(DataSource dataSource) {
     try (Connection conn = dataSource.getConnection()) {
       return detect(conn);
@@ -80,6 +85,8 @@ public final class DatabaseSpecifics {
         case "mysql":
         case "mariadb":
           return MARIADB_DATABASE_SPECIFIC;
+        case "oracle":
+          return ORACLE_DATABASE_SPECIFIC;
         default:
           throw new IllegalStateException(
               "Could not select specifics to use for database product '" + productName + "'");
@@ -162,7 +169,7 @@ public final class DatabaseSpecifics {
     }
 
     @Override
-    public String wrapInsert(String sql) {
+    public String wrapInsert(String sql, String tableName, List<String> keyColumns) {
       return sql + " ON CONFLICT DO NOTHING";
     }
 
@@ -227,7 +234,7 @@ public final class DatabaseSpecifics {
     }
 
     @Override
-    public String wrapInsert(String sql) {
+    public String wrapInsert(String sql, String tableName, List<String> keyColumns) {
       return sql.replace("INSERT INTO", "INSERT IGNORE INTO");
     }
 
@@ -239,6 +246,69 @@ public final class DatabaseSpecifics {
         default:
           return col;
       }
+    }
+  }
+
+  static class OracleDatabaseSpecific implements DatabaseSpecific {
+
+    private static final String ORACLE_CONSTRAINT_VIOLATION_SQL_STATE = "23000";
+    private static final String MYSQL_LOCK_DEADLOCK_SQL_STATE = "40001";
+    private static final String MYSQL_ALREADY_EXISTS_SQL_STATE = "42S01";
+
+    private final Map<Jdbc2ColumnType, String> typeMap;
+    private final Map<Jdbc2ColumnType, Integer> typeIdMap;
+
+    OracleDatabaseSpecific() {
+      typeMap = new EnumMap<>(Jdbc2ColumnType.class);
+      typeIdMap = new EnumMap<>(Jdbc2ColumnType.class);
+      typeMap.put(Jdbc2ColumnType.NAME, "NVARCHAR2(255)");
+      typeIdMap.put(Jdbc2ColumnType.NAME, Types.NVARCHAR);
+      typeMap.put(Jdbc2ColumnType.OBJ_ID, "RAW(255)");
+      typeIdMap.put(Jdbc2ColumnType.OBJ_ID, Types.VARBINARY);
+      typeMap.put(Jdbc2ColumnType.BOOL, "NUMBER(1)");
+      typeIdMap.put(Jdbc2ColumnType.BOOL, Types.BIT);
+      typeMap.put(Jdbc2ColumnType.VARBINARY, "BLOB");
+      typeIdMap.put(Jdbc2ColumnType.VARBINARY, Types.BLOB);
+      typeMap.put(Jdbc2ColumnType.BIGINT, "NUMBER(38)");
+      typeIdMap.put(Jdbc2ColumnType.BIGINT, Types.BIGINT);
+      typeMap.put(Jdbc2ColumnType.VARCHAR, "VARCHAR2(255)");
+      typeIdMap.put(Jdbc2ColumnType.VARCHAR, Types.VARCHAR);
+    }
+
+    @Override
+    public Map<Jdbc2ColumnType, String> columnTypes() {
+      return typeMap;
+    }
+
+    @Override
+    public Map<Jdbc2ColumnType, Integer> columnTypeIds() {
+      return typeIdMap;
+    }
+
+    @Override
+    public boolean isConstraintViolation(SQLException e) {
+      return ORACLE_CONSTRAINT_VIOLATION_SQL_STATE.equals(e.getSQLState());
+    }
+
+    @Override
+    public boolean isRetryTransaction(SQLException e) {
+      return MYSQL_LOCK_DEADLOCK_SQL_STATE.equals(e.getSQLState());
+    }
+
+    @Override
+    public boolean isAlreadyExists(SQLException e) {
+      return MYSQL_ALREADY_EXISTS_SQL_STATE.equals(e.getSQLState());
+    }
+
+    @Override
+    public String wrapInsert(String sql, String tableName, List<String> keyColumns) {
+      return sql.replace("INSERT INTO", String.format("INSERT /*+ IGNORE_ROW_ON_DUPKEY_INDEX(%s(%s)) */ INTO",
+        tableName, String.join(",", keyColumns)));
+    }
+
+    @Override
+    public String primaryKeyCol(String col, Jdbc2ColumnType columnType) {
+      return col;
     }
   }
 }

@@ -226,6 +226,8 @@ public class PersistExtension implements BeforeAllCallback, BeforeEachCallback, 
       ExtensionContext context) {
     StoreConfig.Adjustable config = StoreConfig.Adjustable.empty();
 
+    config = config.withRepositoryId("default");
+
     config =
         extractCustomConfiguration(persistAnnotation, context)
             .apply(context.getTestInstance().orElse(null), config);
